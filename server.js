@@ -1,6 +1,10 @@
 const app = require("./src/app");
-const connectDB = require("./src/db/db")
+const httpserver = require("http").createServer(app);
+const initSocketServer = require("./src/sockets/socker.server");
 
+const connectDB = require("./src/db/db");
 connectDB();
 
-app.listen(3000, () => console.log("server on port 3000"));
+initSocketServer(httpserver);
+
+httpserver.listen(3000, () => console.log("server on port 3000"));
