@@ -19,22 +19,19 @@ module.exports = (io, socket) => {
     });
   });
 
- socket.on("send-message", async ({ groupId, message }) => {
+  socket.on("send-message", async ({ groupId, message }) => {
+    const group = await Group.findOne({
+      _id: groupId,
+      "members.user": socket.user.id,
+    });
 
-  const group = await Group.findOne({
-    _id: groupId,
-    "members.user": socket.user.id,
+    if (!group) {
+      return socket.emit("error", "Not authorized to send message");
+    }
+
+    io.to(groupId).emit("receive-message", {
+      userId: socket.user.id,
+      message,
+    });
   });
-
-  if (!group) {
-    return socket.emit("error", "Not authorized to send message");
-  }
-
-  io.to(groupId).emit("receive-message", {
-    userId: socket.user.id,
-    message,
-  });
-
-});
-
 };

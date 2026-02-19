@@ -1,6 +1,6 @@
 const app = require("./src/app");
 const httpserver = require("http").createServer(app);
-const initSocketServer = require("./src/sockets/socker.server");
+const initSocketServer = require("./src/sockets/socket.server");
 
 const connectDB = require("./src/db/db");
 connectDB();
