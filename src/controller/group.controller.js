@@ -1,8 +1,9 @@
 const groupModel = require("../model/group.model");
+const crypto = require("crypto");
 
 const createGroup = async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.id; //user id
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -28,12 +29,14 @@ const createGroup = async (req, res) => {
       });
     }
 
+    const inviteCode = crypto.randomBytes(4).toString("hex").toUpperCase();
+
     const group = await groupModel.create({
       name: trimmedName,
       description: description?.trim() || "",
       createdBy: userId,
       members: [{ user: userId, role: "admin" }],
-      inviteCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+      inviteCode: inviteCode,
     });
     console.log("Group ID:", group.id);
 
@@ -49,4 +52,5 @@ const createGroup = async (req, res) => {
   }
 };
 
-module.exports = { createGroup };
+const joinGroup = async (req, res) => {};
+module.exports = { createGroup, joinGroup };
