@@ -29,9 +29,15 @@ async function registerUser(req, res) {
       throw new Error("JWT_SECRET not defined");
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -74,9 +80,15 @@ async function loginUser(req, res) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
 
     res.cookie("token", token, {
       httpOnly: true,

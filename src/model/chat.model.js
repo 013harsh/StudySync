@@ -15,6 +15,12 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
 
+    type: {
+      type: String,
+      enum: ["study", "friend"],
+      default: "study",
+    },
+
     text: {
       type: String,
       required: true,
@@ -26,7 +32,7 @@ const messageSchema = new mongoose.Schema(
       default: "approved",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Message", messageSchema);

@@ -19,6 +19,12 @@ const groupSchema = new mongoose.Schema(
       required: true,
     },
 
+    // group.model.js — add this field
+    type: {
+      type: String,
+      enum: ["study", "friend"],
+      default: "study",
+    },
     members: [
       {
         user: {
