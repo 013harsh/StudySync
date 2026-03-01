@@ -1,6 +1,8 @@
 const groupModel = require("../model/group.model");
+const messageModel = require("../model/chat.model");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
+const { getIO } = require("../sockets/io");
 
 const createGroup = async (req, res) => {
   try {
@@ -10,10 +12,18 @@ const createGroup = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { name, description } = req.body;
+    const { name, description, type } = req.body;
 
     if (!name || name.trim() === "") {
       return res.status(400).json({ message: "Group name is required" });
+    }
+
+    const VALID_TYPES = ["study", "friend"];
+    const groupType = type || "study";
+    if (!VALID_TYPES.includes(groupType)) {
+      return res.status(400).json({
+        message: `Invalid group type. Must be one of: ${VALID_TYPES.join(", ")}`,
+      });
     }
 
     const trimmedName = name.trim();
@@ -35,6 +45,7 @@ const createGroup = async (req, res) => {
     const group = await groupModel.create({
       name: trimmedName,
       description: description?.trim() || "",
+      type: groupType,
       createdBy: userId,
       members: [{ user: userId, role: "admin" }],
       inviteCode: inviteCode,
@@ -76,6 +87,13 @@ const deleteGroup = async (req, res) => {
     }
     // delete group
     await groupModel.findByIdAndDelete(groupId);
+    await messageModel.deleteMany({ groupId });
+
+    // 🔴 Real-time: notify all members the group is gone
+    getIO().to(groupId).emit("group:deleted", {
+      groupId,
+      deletedBy: userId,
+    });
 
     return res.status(200).json({ message: "Group deleted successfully" });
   } catch (error) {
@@ -121,6 +139,13 @@ const joinGroup = async (req, res) => {
     group.members.push({ user: userId, role: "member" });
     await group.save();
 
+    // 🟢 Real-time: notify existing members someone joined
+    getIO().to(group._id.toString()).emit("group:user-joined", {
+      groupId: group._id,
+      userId,
+      fullName: req.user?.fullName,
+    });
+
     return res.status(200).json({
       message: "Joined group successfully",
       group,
@@ -139,23 +164,55 @@ const leaveGroup = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    //validation id
+    // validate id
     if (!mongoose.Types.ObjectId.isValid(groupId)) {
       return res.status(400).json({ message: "Invalid group ID" });
     }
-    //find group
+
+    // find group
     const group = await groupModel.findById(groupId);
     if (!group) {
       return res.status(404).json({ message: "Group not found" });
     }
-    // authorization check
+
+    // check user is a member
     const member = group.members.find((m) => m.user.toString() === userId);
     if (!member) {
-      return res.status(403).json({ message: "Unauthorized" });
+      return res
+        .status(403)
+        .json({ message: "You are not a member of this group" });
     }
-    // leave group
+
+    const isAdmin = member.role === "admin";
+
+    // remove user from members
     group.members = group.members.filter((m) => m.user.toString() !== userId);
+
+    // if no members remain, delete the group entirely
+    if (group.members.length === 0) {
+      await groupModel.findByIdAndDelete(groupId);
+      getIO().to(groupId).emit("group:deleted", { groupId, deletedBy: userId });
+      return res
+        .status(200)
+        .json({ message: "Left and group deleted (no members remaining)" });
+    }
+
+    // if admin left, promote the next member to admin
+    if (isAdmin) {
+      group.members[0].role = "admin";
+    }
+
     await group.save();
+
+    // 🟡 Real-time: notify remaining members someone left
+    getIO()
+      .to(groupId)
+      .emit("group:user-left", {
+        groupId,
+        userId,
+        fullName: req.user?.fullName,
+        newAdmin: isAdmin ? group.members[0].user : null,
+      });
 
     return res.status(200).json({ message: "Left group successfully" });
   } catch (error) {
@@ -163,19 +220,101 @@ const leaveGroup = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+// ─── Get Group Members ──────────────────────────────────────────────────────
+// GET /api/group/:id/members
+const getGroupMembers = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-//Update Group	PUT /api/groups/:id
-// 	Get Group Details	GET /api/groups/:id
-// 	List All User Groups	GET /api/groups
-// 	Remove/Kick Member	DELETE /api/groups/:id/members/:memberId
-// 	Generate/Reset Invite Code	POST /api/groups/:id/invite
+    const groupId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      return res.status(400).json({ message: "Invalid group ID" });
+    }
 
-//POST   /api/groups
-//DELETE /api/groups/:id
-//PUT    /api/groups/:id
-//GET    /api/groups/:id
-//GET    /api/groups
-//POST   /api/groups/:id/invite
-//POST   /api/groups/:id/join
+    // Only members of the group can view its member list
+    const group = await groupModel
+      .findOne({ _id: groupId, "members.user": userId })
+      .populate("members.user", "fullName email");
 
-module.exports = { createGroup, deleteGroup, joinGroup, leaveGroup };
+    if (!group) {
+      return res
+        .status(404)
+        .json({ message: "Group not found or you are not a member" });
+    }
+
+    const members = group.members.map((m) => ({
+      _id: m._id,
+      user: {
+        _id: m.user._id,
+        fullName: m.user.fullName,
+        email: m.user.email,
+      },
+      role: m.role,
+      joinedAt: m.joinedAt,
+    }));
+
+    return res.status(200).json({
+      groupId: group._id,
+      name: group.name,
+      type: group.type,
+      memberCount: members.length,
+      members,
+    });
+  } catch (error) {
+    console.error("Get group members error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+// ─── Get My Groups ─────────────────────────────────────────────────────────
+// GET /api/group/my-groups
+const getMyGroups = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Find all groups where this user is a member
+    const groups = await groupModel
+      .find({ "members.user": userId })
+      .select("name description type inviteCode members createdBy createdAt")
+      .populate("createdBy", "fullName email")
+      .sort({ createdAt: -1 });
+
+    // Attach the user's role in each group
+    const result = groups.map((group) => {
+      const member = group.members.find(
+        (m) => m.user.toString() === userId.toString(),
+      );
+      return {
+        _id: group._id,
+        name: group.name,
+        description: group.description,
+        type: group.type,
+        inviteCode: group.inviteCode,
+        memberCount: group.members.length,
+        myRole: member?.role || "member",
+        createdBy: group.createdBy,
+        createdAt: group.createdAt,
+      };
+    });
+
+    return res.status(200).json({ count: result.length, groups: result });
+  } catch (error) {
+    console.error("Get my groups error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+module.exports = {
+  createGroup,
+  deleteGroup,
+  joinGroup,
+  leaveGroup,
+  getGroupMembers,
+  getMyGroups,
+};

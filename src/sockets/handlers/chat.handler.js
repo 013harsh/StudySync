@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Message = require("../../model/chat.model");
 const Group = require("../../model/group.model");
+const chatService = require("../../services/chat.service");
 
 module.exports = (io, socket) => {
   // ─── Send & Receive Message ───────────────────────────────────────────────
@@ -75,8 +76,13 @@ module.exports = (io, socket) => {
   });
 
   // ─── Message Seen ─────────────────────────────────────────────────────────
-  socket.on("message-seen", ({ groupId, messageId }) => {
+  socket.on("message-seen", async ({ groupId, messageId }) => {
     if (!groupId || !messageId) return;
+
+    // ✅ Persist to DB
+    await chatService.markMessagesAsRead(groupId, socket.user?.id);
+
+    // ✅ Broadcast to others
     socket.to(groupId).emit("message-seen", {
       userId: socket.user?.id,
       messageId,

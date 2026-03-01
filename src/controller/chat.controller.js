@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const Message = require("../model/chat.model");
 const Group = require("../model/group.model");
+const MessageModel = require("../model/chat.model");
+const chatService = require("../services/chat.service");
+const { getIO } = require("../sockets/io");
 
-// ─── Get Messages (with Pagination) ──────────────────────────────────────────
-// GET /api/groups/:id/messages?page=1&limit=20
 const getMessages = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -16,11 +16,8 @@ const getMessages = async (req, res) => {
       return res.status(400).json({ message: "Invalid group ID" });
     }
 
-    // Only members can read messages
-    const group = await Group.findOne({
-      _id: groupId,
-      "members.user": userId,
-    });
+    // Check user is a member
+    const group = await Group.findOne({ _id: groupId, "members.user": userId });
     if (!group) {
       return res.status(403).json({ message: "Not a member of this group" });
     }
@@ -32,35 +29,22 @@ const getMessages = async (req, res) => {
         .json({ message: "Study groups do not have message history" });
     }
 
-    // Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
-
-    const totalMessages = await Message.countDocuments({ groupId });
-    const totalPages = Math.ceil(totalMessages / limit);
-
-    const messages = await Message.find({ groupId })
-      .populate("sender", "fullName email")
-      .sort({ createdAt: -1 }) // newest first (scroll up to load more)
-      .skip(skip)
-      .limit(limit);
-
-    return res.status(200).json({
-      messages,
-      currentPage: page,
-      totalPages,
-      totalMessages,
-      hasNextPage: page < totalPages,
+    const { before, limit } = req.query;
+    const messages = await chatService.getGroupMessages(groupId, {
+      before: before || null,
+      limit: parseInt(limit) || 20,
     });
+
+    // Mark messages as read
+    await chatService.markMessagesAsRead(groupId, userId);
+
+    return res.status(200).json({ messages });
   } catch (error) {
     console.error("Get messages error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
-// ─── Delete Message ───────────────────────────────────────────────────────────
-// DELETE /api/messages/:id
 const deleteMessage = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -73,19 +57,26 @@ const deleteMessage = async (req, res) => {
       return res.status(400).json({ message: "Invalid message ID" });
     }
 
-    const message = await Message.findById(messageId);
+    const message = await MessageModel.findById(messageId);
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // Only the sender can delete their own message
+    // Only sender can delete
     if (message.sender.toString() !== userId) {
       return res
         .status(403)
         .json({ message: "Unauthorized — not your message" });
     }
 
-    await Message.findByIdAndDelete(messageId);
+    await chatService.deleteMessageById(messageId);
+
+    // 🔴 Real-time: notify all group members
+    getIO().to(message.groupId.toString()).emit("message-deleted", {
+      messageId,
+      deletedBy: userId,
+    });
+
     return res.status(200).json({ message: "Message deleted successfully" });
   } catch (error) {
     console.error("Delete message error:", error);
@@ -93,8 +84,6 @@ const deleteMessage = async (req, res) => {
   }
 };
 
-// ─── Edit Message ─────────────────────────────────────────────────────────────
-// PUT /api/messages/:id
 const editMessage = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -112,24 +101,31 @@ const editMessage = async (req, res) => {
       return res.status(400).json({ message: "Message text is required" });
     }
 
-    const message = await Message.findById(messageId);
+    const message = await MessageModel.findById(messageId);
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // Only the sender can edit their own message
+    // Only sender can edit
     if (message.sender.toString() !== userId) {
       return res
         .status(403)
         .json({ message: "Unauthorized — not your message" });
     }
 
-    message.text = text.trim();
-    await message.save();
+    const updated = await chatService.editMessageById(messageId, text.trim());
+
+    // 🟡 Real-time: notify all group members
+    getIO().to(message.groupId.toString()).emit("message-edited", {
+      messageId,
+      newText: updated.text,
+      isEdited: true,
+      editedBy: userId,
+    });
 
     return res.status(200).json({
       message: "Message updated successfully",
-      data: message,
+      data: updated,
     });
   } catch (error) {
     console.error("Edit message error:", error);
@@ -137,4 +133,24 @@ const editMessage = async (req, res) => {
   }
 };
 
-module.exports = { getMessages, deleteMessage, editMessage };
+const getUnreadCount = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const groupId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      return res.status(400).json({ message: "Invalid group ID" });
+    }
+
+    const count = await chatService.getUnreadCount(groupId, userId);
+    return res.status(200).json({ unreadCount: count });
+  } catch (error) {
+    console.error("Unread count error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+module.exports = { getMessages, deleteMessage, editMessage, getUnreadCount };

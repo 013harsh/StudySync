@@ -3,9 +3,12 @@ const { socketAuth } = require("../middleware/socket.middleware");
 const groupHandler = require("./handlers/group.handler");
 const chatHandler = require("./handlers/chat.handler");
 const noteHandler = require("./handlers/notes.handler");
+const webrtcHandler = require("./handlers/webrtc.handler");
+const { setIO } = require("./io");
 
 function initSocketServer(httpserver) {
   const io = new Server(httpserver);
+  setIO(io); // register singleton for use in controllers
 
   //add middleware
   io.use(socketAuth);
@@ -16,6 +19,7 @@ function initSocketServer(httpserver) {
     groupHandler(io, socket);
     chatHandler(io, socket);
     noteHandler(io, socket);
+    webrtcHandler(io, socket);
 
     socket.on("disconnect", () => {
       console.log("user disconnected", socket.user?.id);

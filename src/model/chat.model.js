@@ -15,12 +15,6 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
 
-    type: {
-      type: String,
-      enum: ["study", "friend"],
-      default: "study",
-    },
-
     text: {
       type: String,
       required: true,
@@ -31,6 +25,18 @@ const messageSchema = new mongoose.Schema(
       enum: ["approved", "warned", "blocked"],
       default: "approved",
     },
+
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
+
+    readBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true },
 );

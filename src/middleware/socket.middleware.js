@@ -5,8 +5,9 @@ const socketAuth = (socket, next) => {
   const cookies = cookie.parse(socket.handshake.headers?.cookie || "");
   const authHeader = socket.handshake.headers?.authorization;
 
-  // Try cookie first, then Authorization header
-  const token = cookies.token || authHeader;
+  // Try cookie first, then Authorization header (strip "Bearer " prefix if present)
+  const rawToken = cookies.token || authHeader;
+  const token = rawToken?.startsWith("Bearer ") ? rawToken.slice(7) : rawToken;
 
   if (!token) {
     return next(new Error("Authentication error"));
@@ -20,6 +21,5 @@ const socketAuth = (socket, next) => {
   } catch (error) {
     return next(new Error("Authentication error"));
   }
-
 };
 module.exports = { socketAuth };

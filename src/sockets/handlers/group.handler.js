@@ -41,10 +41,10 @@ module.exports = (io, socket) => {
         return socket.emit("error", "Group ID required");
       }
       socket.leave(groupId);
-      console.log(`User ${socket.user.id} left ${groupId}`);
+      console.log(`User ${socket.user?.id} left ${groupId}`);
 
       socket.to(groupId).emit("user-left", {
-        userId: socket.user.id,
+        userId: socket.user?.id,
       });
     } catch (error) {
       console.error("Leave Group Error:", error);
