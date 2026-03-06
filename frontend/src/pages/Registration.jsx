@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../store/authSlice";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const Registration = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -13,14 +22,47 @@ const Registration = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match!");
       return;
     }
-    console.log("Registration submitted", formData);
-    // Add registration logic here
+
+    setLoading(true);
+    // Split full name into first and last name for backend requirements
+    const nameParts = formData.name.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || " ";
+
+    try {
+      const res = await fetch(`${API}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          fullName: { firstName, lastName },
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      // Dispatch Redux login state
+      dispatch(login(data.user));
+      // Navigate to Login page
+      navigate("/login");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,6 +77,25 @@ const Registration = () => {
               Join us and start your journey
             </p>
           </div>
+
+          {error && (
+            <div className="p-3 mb-4 shadow-sm alert alert-error rounded-box">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6 stroke-current shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
@@ -102,8 +163,16 @@ const Registration = () => {
             </div>
 
             <div className="mt-6 form-control">
-              <button type="submit" className="w-full btn btn-primary">
-                Create Account
+              <button
+                type="submit"
+                className="w-full btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </div>
           </form>

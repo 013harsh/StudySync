@@ -34,6 +34,7 @@ async function registerUser(req, res) {
         id: user._id,
         email: user.email,
         fullName: user.fullName,
+        role: user.role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
@@ -50,6 +51,7 @@ async function registerUser(req, res) {
       id: user._id,
       email: user.email,
       fullName: user.fullName,
+      role: user.role,
     };
 
     return res.status(201).json({
@@ -89,6 +91,7 @@ async function loginUser(req, res) {
         id: user._id,
         email: user.email,
         fullName: user.fullName,
+        role: user.role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
@@ -104,6 +107,7 @@ async function loginUser(req, res) {
       id: user._id,
       email: user.email,
       fullName: user.fullName,
+      role: user.role,
     };
     return res
       .status(200)
@@ -124,4 +128,65 @@ async function logout(req, res) {
   }
 }
 
-module.exports = { registerUser, loginUser, logout };
+async function updateProfile(req, res) {
+  try {
+    const { firstName, lastName } = req.body;
+
+    if (!firstName || !lastName) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Use authenticated user from middleware
+    const userId = req.user.id;
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update user details
+    user.fullName = { firstName, lastName };
+    await user.save();
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET not defined");
+    }
+
+    // Re-issue JWT with updated details
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    const userResponse = {
+      id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+    };
+
+    return res
+      .status(200)
+      .json({ message: "Profile updated successfully", user: userResponse });
+  } catch (error) {
+    console.error("Update Profile Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong updating profile" });
+  }
+}
+
+module.exports = { registerUser, loginUser, logout, updateProfile };

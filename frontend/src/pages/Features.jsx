@@ -245,7 +245,7 @@ const Features = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
+            className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-4"
           >
             {CORE_FEATURES.map((feature) => (
               <motion.div
@@ -295,30 +295,6 @@ const Features = () => {
                 </p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA Final ── */}
-      <section className="px-6 py-20">
-        <div className="container mx-auto">
-          <div className="bg-primary rounded-[3rem] p-12 md:p-20 text-center text-primary-content relative overflow-hidden shadow-2xl shadow-primary/30">
-            <h2 className="relative z-10 mb-8 text-3xl font-black md:text-5xl lg:text-6xl">
-              Ready to sync your squad?
-            </h2>
-            <p className="relative z-10 max-w-xl mx-auto mb-10 text-xl opacity-80">
-              Join thousands of students across 500+ universities simplifying
-              their collaboration.
-            </p>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative z-10 px-12 font-black bg-white border-none rounded-full shadow-xl btn btn-lg text-primary hover:bg-white/90"
-              onClick={() => window.scrollTo({ top: 400, behavior: "smooth" })}
-            >
-              Get Started Now
-            </motion.button>
           </div>
         </div>
       </section>

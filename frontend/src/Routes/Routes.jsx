@@ -5,6 +5,7 @@ import Registration from "../pages/Registration.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Account from "../pages/Account.jsx";
 import Features from "../pages/Features.jsx";
+import ProtectedRoute from "../components/ProtectedRoute.jsx";
 
 const AppRoutes = () => {
   return (
@@ -12,9 +13,23 @@ const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Registration />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/account" element={<Account />} />
       <Route path="/features" element={<Features />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute>
+            <Account />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };

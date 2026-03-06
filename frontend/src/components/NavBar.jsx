@@ -1,17 +1,46 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { useTheme } from "../context/ThemeContext";
+import { logout as logoutAction } from "../store/authSlice";
+
+const API = import.meta.env.VITE_API_URL;
 
 const NavBar = () => {
   const { theme, setTheme } = useTheme();
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const firstName = user?.fullName?.firstName || "Guest";
+  const lastName = user?.fullName?.lastName || "User";
+  const email = user?.email || "guest@example.com";
+  const isGuest = !user;
 
   // Toggle between forest & winter
   const toggleTheme = () => {
     setTheme(theme === "winter" ? "forest" : "winter");
   };
 
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      dispatch(logoutAction());
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still logout on frontend even if backend fails
+      dispatch(logoutAction());
+      navigate("/login");
+    }
+  };
+
   return (
-    <div className="py-2 border-b shadow-xl px-9 navbar bg-base-100 border-base-200">
-      <div className="flex-1">
+    <div className="p-5 border-b shadow-xl  px-9 navbar bg-base-100 border-base-500">
+      <div className="flex-1 bg">
         <Link
           to="/"
           className="text-xl font-bold normal-case btn btn-ghost text-primary"
@@ -20,7 +49,15 @@ const NavBar = () => {
         </Link>
       </div>
 
-      <div className="flex items-center flex-none gap-2 ml-4">
+      <div className="flex items-center  flex-none gap-6 ml-4">
+        <Link className="font-bold" to="/features">
+          Create Group
+        </Link>
+
+        <Link className="font-bold" to="/dashboard">
+          Dashboard
+        </Link>
+
         {/* Theme Toggle */}
         <div className="flex items-center gap-2 mr-4">
           <button
@@ -58,7 +95,7 @@ const NavBar = () => {
           >
             <div className="w-10 border-2 rounded-full border-primary/50 hover:border-primary">
               <img
-                src="https://ui-avatars.com/api/?name=John+Doe&background=random"
+                src={`https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=random`}
                 alt="User Avatar"
               />
             </div>
@@ -69,10 +106,10 @@ const NavBar = () => {
             className="mt-3 z-[100] p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-box w-52 border border-base-200"
           >
             <li className="px-4 py-2 mb-2 border-b menu-title border-base-200">
-              <span className="font-semibold">John Doe</span>
-              <span className="text-xs text-base-content/60">
-                john@example.com
+              <span className="font-semibold">
+                {firstName} {lastName}
               </span>
+              <span className="text-xs text-base-content/60">{email}</span>
             </li>
 
             <li>
@@ -83,13 +120,22 @@ const NavBar = () => {
               <Link to="/dashboard">My Dashboard</Link>
             </li>
 
-            <div className="my-0 divider"></div>
-
-            <li>
-              <Link to="/login" className="text-error hover:bg-error/10">
-                Logout
-              </Link>
-            </li>
+            {isGuest ? (
+              <li>
+                <Link to="/login" className="text-primary hover:bg-primary/10">
+                  Login / Register
+                </Link>
+              </li>
+            ) : (
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="text-error hover:bg-error/10"
+                >
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       </div>

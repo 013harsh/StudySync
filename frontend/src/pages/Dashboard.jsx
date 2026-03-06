@@ -7,7 +7,7 @@ import QuickActions from "../components/dashboard/QuickActions";
 import GroupsTable from "../components/dashboard/GroupsTable";
 import InviteCodes from "../components/dashboard/InviteCodes";
 
-const API = "http://localhost:3000";
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -29,7 +29,16 @@ const Dashboard = () => {
         const res = await fetch(`${API}/api/group/my-groups`, {
           credentials: "include",
         });
-        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+        
+        if (res.status === 401) {
+          setError("Session expired. Please login again.");
+          return;
+        }
+        
+        if (!res.ok) {
+          throw new Error(`Server responded with ${res.status}`);
+        }
+        
         const data = await res.json();
         setGroups(data.groups ?? []);
       } catch (err) {
@@ -41,10 +50,10 @@ const Dashboard = () => {
   }, []);
 
   /* derived */
-  const firstName = user?.fullName?.firstName ?? "Student";
-  const lastName = user?.fullName?.lastName ?? "";
-  const email = user?.email ?? "—";
-  const role = user?.role ?? "user";
+  const firstName = user?.fullName?.firstName || "Student";
+  const lastName = user?.fullName?.lastName || "";
+  const email = user?.email || "—";
+  const role = user?.role || "user";
 
   const studyGroups = groups.filter((g) => g.type === "study");
   const friendGroups = groups.filter((g) => g.type === "friend");
