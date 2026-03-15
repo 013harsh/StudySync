@@ -1,4 +1,5 @@
 /* GroupsTable — DaisyUI semantic tokens only */
+import { useNavigate } from "react-router-dom";
 
 function TypeBadge({ type }) {
   return type === "study" ? (
@@ -27,6 +28,12 @@ function formatDate(iso) {
 }
 
 const GroupsTable = ({ groups, loading, error }) => {
+  const navigate = useNavigate();
+
+  const handleRowClick = (groupId) => {
+    navigate(`/room/${groupId}`);
+  };
+
   /* Loading */
   if (loading) {
     return (
@@ -78,7 +85,11 @@ const GroupsTable = ({ groups, loading, error }) => {
         </thead>
         <tbody>
           {groups.map((g) => (
-            <tr key={g._id} className="align-middle cursor-pointer hover">
+            <tr
+              key={g._id}
+              className="align-middle cursor-pointer hover"
+              onClick={() => handleRowClick(g._id)}
+            >
               <td>
                 <p className="font-bold text-base-content">{g.name}</p>
                 {g.description && (

@@ -8,4 +8,7 @@ connectDB();
 
 initSocketServer(httpserver);
 
-httpserver.listen(3000, () => console.log("server on port 3000"));
+// httpserver.listen(3000, () => console.log("server on port 3000"));
+httpserver.listen(3000, "0.0.0.0", () => {
+  console.log("Server running on port 3000");
+});
