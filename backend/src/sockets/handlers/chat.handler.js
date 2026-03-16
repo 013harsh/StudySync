@@ -7,6 +7,7 @@ module.exports = (io, socket) => {
   // ─── Send & Receive Message ───────────────────────────────────────────────
   socket.on("send-message", async ({ groupId, message }) => {
     try {
+      // console.log("socket.user →", socket.user);
       // 1. Auth check
       if (!socket.user) {
         return socket.emit("error", { message: "Unauthorized" });
@@ -53,7 +54,7 @@ module.exports = (io, socket) => {
         groupId,
         sender: {
           _id: socket.user.id,
-          fullName: socket.user.fullName,
+          fullName: `${socket.user.fullName.firstName} ${socket.user.fullName.lastName}`,
           email: socket.user.email,
         },
         text: cleanMessage,

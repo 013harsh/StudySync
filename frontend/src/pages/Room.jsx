@@ -21,9 +21,9 @@ const Room = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("chat");
   const [timerSession, setTimerSession] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
 
-  // const myRole = user?.role || "user";
-  // const isHost = myRole === "admin";
   const myMember = members.find(
     (m) => m.user?._id === user?.id || m.user?._id === user?._id,
   );
@@ -70,7 +70,8 @@ const Room = () => {
     // Initialize Socket.IO connection
     socketRef.current = io(API, {
       withCredentials: true,
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
+      upgrade: true,
     });
 
     const socket = socketRef.current;
@@ -138,6 +139,10 @@ const Room = () => {
       }
     });
 
+    socket.on("receive-message", (data) => {
+      setMessages((prev) => [...prev, data]);
+    });
+
     // Cleanup on unmount
     return () => {
       socket.emit("leave-group", { groupId, userId: user.id });
@@ -145,6 +150,15 @@ const Room = () => {
     };
   }, [groupId, user]);
 
+  const sendMessage = () => {
+    if (!chatInput.trim()) return;
+    socketRef.current.emit("send-message", {
+      groupId,
+      message: chatInput.trim(),
+    });
+
+    setChatInput(""); // clear input after send
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-base-200">
@@ -206,7 +220,6 @@ const Room = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel - Members & Presence */}
         <MemberPanel members={members} onlineUsers={onlineUsers} />
-
         {/* Center Panel - Timer */}
         <div className="flex flex-col flex-1">
           <TimerDisplay session={timerSession} isHost={isHost} />
@@ -220,7 +233,6 @@ const Room = () => {
           </div>
         </div>
 
-        {/* Right Panel - Chat & Notes Tabs */}
         <div className="flex flex-col w-96 border-l bg-base-100 border-base-300">
           {/* Tabs */}
           <div className="border-b tabs tabs-boxed border-base-300">
@@ -243,18 +255,39 @@ const Room = () => {
             {activeTab === "chat" ? (
               <div className="flex flex-col h-full">
                 <div className="flex-1 p-4 overflow-y-auto">
-                  <div className="text-center text-base-content/40">
-                    <p className="text-sm">Chat messages will appear here</p>
-                  </div>
+                  {messages.length === 0 ? (
+                    <div className="text-center text-base-content/40">
+                      <p className="text-sm">Chat messages will appear here</p>
+                    </div>
+                  ) : (
+                    messages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={`chat ${msg.sender._id === user?.id ? "chat-end" : "chat-start"}`}
+                      >
+                        <div className="chat-header text-xs opacity-50">
+                          {msg.sender.fullName}
+                        </div>
+                        <div className="chat-bubble">{msg.text}</div>
+                      </div>
+                    ))
+                  )}
                 </div>
+
                 <div className="p-4 border-t border-base-300">
                   <div className="flex gap-2">
                     <input
                       type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                       placeholder="Type a message..."
                       className="flex-1 input input-bordered"
                     />
-                    <button className="btn btn-primary">Send</button>
+                    {/* <button className="btn btn-primary" >Send</button> */}
+                    <button onClick={sendMessage} className="btn btn-primary">
+                      Send
+                    </button>
                   </div>
                 </div>
               </div>

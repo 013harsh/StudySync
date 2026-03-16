@@ -8,7 +8,14 @@ const studyRoomHandler = require("./handlers/studyRoom.handler");
 const { setIO } = require("./io");
 
 function initSocketServer(httpserver) {
-  const io = new Server(httpserver);
+  const io = new Server(httpserver, {
+    cors: {
+      origin: "http://localhost:5173",
+      credentials: true,
+    },
+    transports: ["polling", "websocket"],
+    upgrade: true,
+  });
   setIO(io); // register singleton for use in controllers
 
   //add middleware

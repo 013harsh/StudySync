@@ -3,6 +3,8 @@ import NavBar from "./components/NavBar";
 import Routes from "./Routes/Routes";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useTheme } from "./context/ThemeContext";
+// import { useEffect } from "react";
+
 
 
 export const App = () => {
