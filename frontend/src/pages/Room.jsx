@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import io from "socket.io-client";
 import MemberPanel from "../components/room/MemberPanel";
 import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
+import io from "socket.io-client";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -127,6 +127,7 @@ const Room = () => {
             isRunning: data.isRunning,
             pausedAt: data.pausedAt || null,
             startedAt: data.startedAt || prev.startedAt,
+            isFinished: data.isFinished || false, // ✅ add this
           };
         });
       }

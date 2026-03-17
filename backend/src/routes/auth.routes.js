@@ -4,12 +4,13 @@ const {
   loginUser,
   logout,
   updateProfile,
+  getMe,
 } = require("../controller/auth.controller");
-const {authMiddleware} = require("../middleware/auth.middleware");
+const { authMiddleware } = require("../middleware/auth.middleware");
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.post("/logout", logout);
+router.post("/logout", authMiddleware, logout);
 router.put("/profile", authMiddleware, updateProfile);
-
+router.get("/me", authMiddleware, getMe);
 module.exports = router;

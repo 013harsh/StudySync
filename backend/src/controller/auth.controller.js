@@ -5,14 +5,13 @@ const jwt = require("jsonwebtoken");
 async function registerUser(req, res) {
   try {
     const { fullName, email, password } = req.body;
-    const { firstName, lastName } = fullName || {};
 
+    const { firstName, lastName } = fullName || {};
     if (!fullName || !firstName || !lastName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const isexistAlready = await userModel.findOne({ email });
-
     if (isexistAlready) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -37,15 +36,15 @@ async function registerUser(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
     );
 
-    res.cookie("token", token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    };
+
+    res.cookie("token", token, cookieOptions);
 
     const userResponse = {
       id: user._id,
@@ -77,6 +76,7 @@ async function loginUser(req, res) {
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
+
     const ispasswordMatched = await bcrypt.compare(password, user.password);
     if (!ispasswordMatched) {
       return res.status(400).json({ message: "Invalid email or password" });
@@ -94,15 +94,14 @@ async function loginUser(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
     });
+
     const userResponse = {
       id: user._id,
       email: user.email,
@@ -161,14 +160,12 @@ async function updateProfile(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
     });
 
     const userResponse = {
@@ -189,4 +186,17 @@ async function updateProfile(req, res) {
   }
 }
 
-module.exports = { registerUser, loginUser, logout, updateProfile };
+async function getMe(req, res) {
+  try {
+    const user = await userModel.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error("GetMe Error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+}
+
+module.exports = { registerUser, loginUser, logout, updateProfile, getMe };

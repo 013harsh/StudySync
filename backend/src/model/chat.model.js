@@ -20,11 +20,11 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
 
-    aiStatus: {
-      type: String,
-      enum: ["approved", "warned", "blocked"],
-      default: "approved",
-    },
+    // aiStatus: {
+    //   type: String,
+    //   enum: ["approved", "warned", "blocked"],
+    //   default: "approved",
+    // },
 
     isEdited: {
       type: Boolean,
