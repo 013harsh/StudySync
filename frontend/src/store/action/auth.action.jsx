@@ -48,7 +48,6 @@ export const usercurrent = () => async (dispatch) => {
       withCredentials: true,
     });
 
-    console.log(res.data.user);
     dispatch(loginSuccess(res.data.user));
     return { success: true, user: res.data.user };
   } catch (error) {

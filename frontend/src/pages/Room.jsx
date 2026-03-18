@@ -75,10 +75,8 @@ const Room = () => {
     });
 
     const socket = socketRef.current;
-
     // Join the group room
     socket.emit("join-group", groupId);
-
     // Listen for presence updates
     socket.on("room:presence-update", (data) => {
       console.log("Presence update:", data);
@@ -86,7 +84,6 @@ const Room = () => {
         setOnlineUsers(data.onlineUsers || []);
       }
     });
-
     // Listen for user joined (legacy support)
     socket.on("user-joined", (data) => {
       console.log("User joined:", data);
@@ -219,21 +216,19 @@ const Room = () => {
 
       {/* Main Layout */}
       <div className="flex flex-1 overflow-hidden">
+
         {/* Left Panel - Members & Presence */}
         <MemberPanel members={members} onlineUsers={onlineUsers} />
+
         {/* Center Panel - Timer */}
         <div className="flex flex-col flex-1">
           <TimerDisplay session={timerSession} isHost={isHost} />
           <div className="border-t border-base-300">
-            <TimerControls
-              socket={socketRef.current}
-              groupId={groupId}
-              session={timerSession}
-              isHost={isHost}
-            />
+            <TimerControls socket={socketRef.current} groupId={groupId} session={timerSession} isHost={isHost} />
           </div>
         </div>
 
+        {/* Right Panel - Chat & Notes */}
         <div className="flex flex-col w-96 border-l bg-base-100 border-base-300">
           {/* Tabs */}
           <div className="border-b tabs tabs-boxed border-base-300">

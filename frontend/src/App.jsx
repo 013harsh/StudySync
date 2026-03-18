@@ -13,7 +13,7 @@ export const App = () => {
 
   useEffect(() => {
     disatch(usercurrent());
-  }, [disatch]);
+  }, []);
 
   return (
     <ErrorBoundary>
