@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useTheme } from "../context/ThemeContext";
-import { logout as logoutAction } from "../store/authSlice";
+import { userLogout } from "../store/action/auth.action";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -23,19 +23,8 @@ const NavBar = () => {
 
   // Handle logout
   const handleLogout = async () => {
-    try {
-      await fetch(`${API}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-      dispatch(logoutAction());
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      // Still logout on frontend even if backend fails
-      dispatch(logoutAction());
-      navigate("/login");
-    }
+    dispatch(userLogout());
+    navigate("/login");
   };
 
   return (

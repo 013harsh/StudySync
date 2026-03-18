@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login } from "../store/authSlice";
+import { userRegister } from "../store/action/auth.action";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -12,7 +12,8 @@ const Registration = () => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -25,43 +26,29 @@ const Registration = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
+      setError("Passwords do not match");
       return;
     }
 
     setLoading(true);
-    // Split full name into first and last name for backend requirements
-    const nameParts = formData.name.trim().split(" ");
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(" ") || " ";
 
-    try {
-      const res = await fetch(`${API}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          fullName: { firstName, lastName },
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+    const { firstName, lastName, email, password } = formData;
+    const result = await dispatch(
+      userRegister({
+        fullName: { firstName, lastName },
+        email,
+        password,
+      }),
+    );
 
-      const data = await res.json();
+    setLoading(false);
 
-      if (!res.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      // Dispatch Redux login state
-      dispatch(login(data.user));
-      // Navigate to Login page
+    if (result.success) {
       navigate("/login");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error);
     }
   };
 
@@ -99,18 +86,34 @@ const Registration = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
-              <label className="label" htmlFor="name">
-                <span className="font-medium label-text">Full Name</span>
+              <label className="label" htmlFor="firstName">
+                <span className="font-medium label-text">First Name</span>
               </label>
               <input
-                id="name"
-                name="name"
+                id="firstName"
+                name="firstName"
                 type="text"
                 required
-                value={formData.name}
+                value={formData.firstName}
                 onChange={handleChange}
                 className="w-full input input-bordered"
-                placeholder="John Doe"
+                placeholder="John"
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label" htmlFor="lastName">
+                <span className="font-medium label-text">Last Name</span>
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                required
+                value={formData.lastName}
+                onChange={handleChange}
+                className="w-full input input-bordered"
+                placeholder="Doe"
               />
             </div>
 

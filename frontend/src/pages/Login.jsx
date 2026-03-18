@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login } from "../store/authSlice";
-
+import { userLogin } from "../store/action/auth.action";
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const Login = () => {
@@ -10,7 +9,6 @@ const Login = () => {
   const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
@@ -22,28 +20,14 @@ const Login = () => {
     setError(null);
     setLoading(true);
 
-    try {
-      const res = await fetch(`${API}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+    const result = await dispatch(userLogin(formData));
 
-      const data = await res.json();
+    setLoading(false);
 
-      if (!res.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // Dispatch Redux login state
-      dispatch(login(data.user));
-      // Navigate to Dashboard
+    if (result.success) {
       navigate("/dashboard");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error);
     }
   };
 

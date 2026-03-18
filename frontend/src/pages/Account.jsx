@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { login } from "../store/authSlice";
+import { userUpdate } from "../store/action/auth.action";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -24,30 +24,13 @@ const Account = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccessMsg("");
-    setErrorMsg("");
 
     try {
+      // Split fullName → firstName + lastName for backend
       const nameParts = formData.fullName.trim().split(" ");
-      const newFirstName = nameParts[0];
-      const newLastName = nameParts.slice(1).join(" ") || " ";
-
-      const res = await fetch(`${API}/api/auth/profile`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          firstName: newFirstName,
-          lastName: newLastName,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to update profile");
-
-      // Cascade Redux & LocalStorage update
-      dispatch(login(data.user));
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(" ") || " ";
+      dispatch(userUpdate({ firstName, lastName }));
       setSuccessMsg("Profile updated successfully!");
     } catch (err) {
       setErrorMsg(err.message);

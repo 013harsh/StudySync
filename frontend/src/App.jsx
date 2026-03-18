@@ -3,12 +3,17 @@ import NavBar from "./components/NavBar";
 import Routes from "./Routes/Routes";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useTheme } from "./context/ThemeContext";
-// import { useDispatch } from "react-redux";
-// import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { usercurrent } from "./store/action/auth.action";
 
 export const App = () => {
   const { theme } = useTheme();
-  // const disatch = useDispatch();
+  const disatch = useDispatch();
+
+  useEffect(() => {
+    disatch(usercurrent());
+  }, [disatch]);
 
   return (
     <ErrorBoundary>
