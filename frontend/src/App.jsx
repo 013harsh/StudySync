@@ -9,12 +9,11 @@ import { usercurrent } from "./store/action/auth.action";
 
 export const App = () => {
   const { theme } = useTheme();
-  const disatch = useDispatch();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    disatch(usercurrent());
+    dispatch(usercurrent());
   }, []);
-
   return (
     <ErrorBoundary>
       <div

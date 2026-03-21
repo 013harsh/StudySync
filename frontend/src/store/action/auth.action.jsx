@@ -1,5 +1,5 @@
 import axios from "axios";
-import { loginSuccess, logout, Register } from "../reducer/auth.sclice";
+import { loginSuccess, logout, Register } from "../reducer/auth.slice";
 
 // const dispatch = useDispatch();
 export const userRegister = (data) => async (dispatch) => {

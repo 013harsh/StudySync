@@ -4,7 +4,16 @@ const Group = require("../../model/group.model");
 const chatService = require("../../services/chat.service");
 
 module.exports = (io, socket) => {
-  // ─── Send & Receive Message ───────────────────────────────────────────────
+  socket.on("join-chat", (groupId) => {
+    // This tells Socket.IO: "add this socket connection to this specific room"
+    socket.join(groupId);
+  });
+
+  socket.on("leave-chat", (groupId) => {
+    socket.leave(groupId);
+  });
+
+  //  Send & Receive Message
   socket.on("send-message", async ({ groupId, message }) => {
     try {
       // console.log("socket.user →", socket.user);
@@ -67,7 +76,7 @@ module.exports = (io, socket) => {
     }
   });
 
-  // ─── Typing Indicator ─────────────────────────────────────────────────────
+  //  Typing Indicator
   socket.on("typing", ({ groupId, isTyping }) => {
     if (!groupId) return;
     socket.to(groupId).emit("typing", {
@@ -76,7 +85,7 @@ module.exports = (io, socket) => {
     });
   });
 
-  // ─── Message Seen ─────────────────────────────────────────────────────────
+  //  Message Seen
   socket.on("message-seen", async ({ groupId, messageId }) => {
     if (!groupId || !messageId) return;
 

@@ -1,4 +1,6 @@
 import { useState, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { joinGroup } from "../../store/action/group.action";
 
 const API = "http://localhost:3000";
 
@@ -22,39 +24,24 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
     dialogRef.current?.showModal();
   };
   const close = () => dialogRef.current?.close();
-
+  const dispatch = useDispatch();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const trimmed = code.trim().toUpperCase();
-    if (!trimmed) {
-      setError("Please enter an invite code.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
     try {
-      const res = await fetch(`${API}/api/group/join`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteCode: trimmed }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message ?? "Something went wrong");
+      // Dispatch Redux action (assuming you update joinGroup to accept the code if needed)
+      // Note: your action currently accepts `groupId`, if you changed your API to accept `inviteCode`,
+      // you'll need to pass `inviteCode: trimmed` to your Redux action!
+      const result = await dispatch(joinGroup(trimmed));
 
-      setSuccess(
-        `You joined "${data.group?.name ?? "the group"}" successfully!`,
-      );
-      onSuccess?.(data.group);
+      setSuccess("You joined the group successfully!");
+      onSuccess?.(result?.group);
+
       setTimeout(() => {
         close();
         reset();
       }, 1800);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to join group");
     } finally {
       setLoading(false);
     }

@@ -7,11 +7,10 @@ const { getIO } = require("../sockets/io");
 const getMessages = async (req, res) => {
   try {
     const userId = req.user?.id;
+    const groupId = req.params.id;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    const groupId = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(groupId)) {
       return res.status(400).json({ message: "Invalid group ID" });
     }

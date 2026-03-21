@@ -1,4 +1,6 @@
 import { useState, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { createGroup } from "../../store/action/group.action";
 
 const API = "http://localhost:3000";
 
@@ -26,42 +28,28 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
     dialogRef.current?.showModal();
   };
   const close = () => dialogRef.current?.close();
-
+  const dispatch = useDispatch();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) {
-      setError("Group name is required.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
     try {
-      const res = await fetch(`${API}/api/group/create`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      // Dispatch the Redux action
+      await dispatch(
+        createGroup({
           name: name.trim(),
           description: description.trim(),
           type,
         }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message ?? "Something went wrong");
-
-      setSuccess(
-        `"${data.group.name}" created! Invite code: ${data.group.inviteCode}`,
       );
-      onSuccess?.(data.group);
+
+      setSuccess(`Group created successfully!`);
+      onSuccess?.(); // Optional callback
+
       setTimeout(() => {
         close();
         reset();
       }, 1800);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to create group");
     } finally {
       setLoading(false);
     }

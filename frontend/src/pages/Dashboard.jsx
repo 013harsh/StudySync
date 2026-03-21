@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchMyGroups } from "../store/action/group.action";
 
 import StatCard from "../components/dashboard/StatCard";
 import UserProfileCard from "../components/dashboard/UserProfileCard";
@@ -17,37 +18,26 @@ function getGreeting() {
 }
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-
-  const [groups, setGroups] = useState([]);
+  const groups = useSelector((state) => state.group.group) || [];
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    (async () => {
+    const loadGroups = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`${API}/api/group/my-groups`, {
-          credentials: "include",
-        });
-        
-        if (res.status === 401) {
-          setError("Session expired. Please login again.");
-          return;
-        }
-        
-        if (!res.ok) {
-          throw new Error(`Server responded with ${res.status}`);
-        }
-        
-        const data = await res.json();
-        setGroups(data.groups ?? []);
+        await dispatch(fetchMyGroups());
       } catch (err) {
-        setError(err.message);
+        setError("Failed to load groups.");
       } finally {
         setLoading(false);
       }
-    })();
-  }, []);
+    };
+
+    loadGroups();
+  }, [dispatch]);
 
   /* derived */
   const firstName = user?.fullName?.firstName || "Student";

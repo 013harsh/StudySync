@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import MemberPanel from "../components/room/MemberPanel";
 import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
 import io from "socket.io-client";
+import { fetchMessage } from "../store/action/chat.action";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -13,6 +14,7 @@ const Room = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const socketRef = useRef(null);
+  const dispatch = useDispatch();
 
   const [groupData, setGroupData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,21 +31,13 @@ const Room = () => {
   );
   const isHost = myMember?.role === "admin";
 
+  // fectch message
   useEffect(() => {
-    // Fetch group data using the members endpoint which includes group info
     const fetchGroup = async () => {
       try {
         const res = await fetch(`${API}/api/group/${groupId}/members`, {
           credentials: "include",
         });
-
-        if (!res.ok) {
-          if (res.status === 404)
-            throw new Error("Group not found or you are not a member");
-          if (res.status === 401)
-            throw new Error("Unauthorized - Please login");
-          throw new Error("Failed to load group");
-        }
 
         const data = await res.json();
 
@@ -54,6 +48,10 @@ const Room = () => {
           description: "",
         });
         setMembers(data.members || []);
+
+        if (data.type === "friend") {
+          dispatch(fetchMessage(data.groupId));
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -62,12 +60,12 @@ const Room = () => {
     };
 
     fetchGroup();
-  }, [groupId]);
+  }, [groupId, dispatch]);
 
+  //socket connection
   useEffect(() => {
     if (!user || !groupId) return;
 
-    // Initialize Socket.IO connection
     socketRef.current = io(API, {
       withCredentials: true,
       transports: ["polling", "websocket"],
@@ -75,16 +73,16 @@ const Room = () => {
     });
 
     const socket = socketRef.current;
-    // Join the group room
+
     socket.emit("join-group", groupId);
-    // Listen for presence updates
+
     socket.on("room:presence-update", (data) => {
       console.log("Presence update:", data);
       if (data.groupId === groupId) {
         setOnlineUsers(data.onlineUsers || []);
       }
     });
-    // Listen for user joined (legacy support)
+
     socket.on("user-joined", (data) => {
       console.log("User joined:", data);
       setOnlineUsers((prev) => {
@@ -95,18 +93,15 @@ const Room = () => {
       });
     });
 
-    // Listen for user left (legacy support)
     socket.on("user-left", (data) => {
       console.log("User left:", data);
       setOnlineUsers((prev) => prev.filter((id) => id !== data.userId));
     });
 
-    // Handle socket errors
     socket.on("error", (error) => {
       console.error("Socket error:", error);
     });
 
-    // Timer session events
     socket.on("room:session-started", (data) => {
       console.log("📊 Session started:", data);
       if (data.groupId === groupId && data.session) {
@@ -124,7 +119,7 @@ const Room = () => {
             isRunning: data.isRunning,
             pausedAt: data.pausedAt || null,
             startedAt: data.startedAt || prev.startedAt,
-            isFinished: data.isFinished || false, // ✅ add this
+            isFinished: data.isFinished || false,
           };
         });
       }
@@ -141,7 +136,6 @@ const Room = () => {
       setMessages((prev) => [...prev, data]);
     });
 
-    // Cleanup on unmount
     return () => {
       socket.emit("leave-group", { groupId, userId: user.id });
       socket.disconnect();
@@ -155,7 +149,7 @@ const Room = () => {
       message: chatInput.trim(),
     });
 
-    setChatInput(""); // clear input after send
+    setChatInput("");
   };
   if (loading) {
     return (
@@ -216,7 +210,6 @@ const Room = () => {
 
       {/* Main Layout */}
       <div className="flex flex-1 overflow-hidden">
-
         {/* Left Panel - Members & Presence */}
         <MemberPanel members={members} onlineUsers={onlineUsers} />
 
@@ -224,12 +217,17 @@ const Room = () => {
         <div className="flex flex-col flex-1">
           <TimerDisplay session={timerSession} isHost={isHost} />
           <div className="border-t border-base-300">
-            <TimerControls socket={socketRef.current} groupId={groupId} session={timerSession} isHost={isHost} />
+            <TimerControls
+              socket={socketRef.current}
+              groupId={groupId}
+              session={timerSession}
+              isHost={isHost}
+            />
           </div>
         </div>
 
         {/* Right Panel - Chat & Notes */}
-        <div className="flex flex-col w-96 border-l bg-base-100 border-base-300">
+        <div className="flex flex-col border-l w-96 bg-base-100 border-base-300">
           {/* Tabs */}
           <div className="border-b tabs tabs-boxed border-base-300">
             <button
@@ -261,7 +259,7 @@ const Room = () => {
                         key={i}
                         className={`chat ${msg.sender._id === user?.id ? "chat-end" : "chat-start"}`}
                       >
-                        <div className="chat-header text-xs opacity-50">
+                        <div className="text-xs opacity-50 chat-header">
                           {msg.sender.fullName}
                         </div>
                         <div className="chat-bubble">{msg.text}</div>
