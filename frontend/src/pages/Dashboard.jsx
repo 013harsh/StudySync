@@ -8,7 +8,6 @@ import QuickActions from "../components/dashboard/QuickActions";
 import GroupsTable from "../components/dashboard/GroupsTable";
 import InviteCodes from "../components/dashboard/InviteCodes";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -52,7 +51,6 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-base-200">
       <div className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-10">
-        {/* ── Page Heading ── */}
         <div className="rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 px-8 py-7 mb-8 shadow-lg shadow-blue-200 flex items-center justify-between flex-wrap gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-blue-100">
@@ -67,10 +65,7 @@ const Dashboard = () => {
           </span>
         </div>
 
-        {/* ── Main 3-col Layout ── */}
-        {/* Sidebar (left) + Main content (right 2/3) */}
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-          {/* ── Left Sidebar ── */}
           <aside className="flex flex-col gap-4">
             <UserProfileCard
               firstName={firstName}
@@ -81,9 +76,7 @@ const Dashboard = () => {
             <QuickActions />
           </aside>
 
-          {/* ── Right Main ── */}
           <main className="flex flex-col gap-6">
-            {/* KPI Row */}
             <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
               <StatCard
                 icon="🏫"
@@ -108,7 +101,6 @@ const Dashboard = () => {
               />
             </div>
 
-            {/* Groups Table */}
             <div className="border shadow-sm card bg-base-100 border-base-300">
               <div className="gap-4 p-5 card-body">
                 <div className="flex items-center justify-between">
@@ -123,7 +115,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Invite Codes (admin only) */}
             <InviteCodes adminGroups={adminGroups} />
           </main>
         </div>

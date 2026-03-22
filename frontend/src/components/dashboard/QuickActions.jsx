@@ -2,8 +2,18 @@
 import { Link } from "react-router-dom";
 
 const ACTIONS = [
-  { label: "Create Study Group", icon: "📚", to: "#", cls: "btn-primary" },
-  { label: "Join with Code", icon: "🔑", to: "#", cls: "btn-secondary" },
+  {
+    label: "Create Study Group",
+    icon: "📚",
+    to: "/features",
+    cls: "btn-primary",
+  },
+  {
+    label: "Join with Code",
+    icon: "🔑",
+    to: "/features",
+    cls: "btn-secondary",
+  },
   {
     label: "Account Settings",
     icon: "⚙️",

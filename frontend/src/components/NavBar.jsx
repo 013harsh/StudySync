@@ -3,8 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useTheme } from "../context/ThemeContext";
 import { userLogout } from "../store/action/auth.action";
 
-const API = import.meta.env.VITE_API_URL;
-
 const NavBar = () => {
   const { theme, setTheme } = useTheme();
   const { user } = useSelector((state) => state.auth);
@@ -16,12 +14,10 @@ const NavBar = () => {
   const email = user?.email || "guest@example.com";
   const isGuest = !user;
 
-  // Toggle between forest & winter
   const toggleTheme = () => {
     setTheme(theme === "winter" ? "forest" : "winter");
   };
 
-  // Handle logout
   const handleLogout = async () => {
     dispatch(userLogout());
     navigate("/login");
@@ -31,7 +27,7 @@ const NavBar = () => {
     <div className="p-5 border-b shadow-xl  px-9 navbar bg-base-100 border-base-500">
       <div className="flex-1 bg">
         <Link
-          to="/"
+          to="/home"
           className="text-xl font-bold normal-case btn btn-ghost text-primary"
         >
           StudySync
@@ -39,15 +35,6 @@ const NavBar = () => {
       </div>
 
       <div className="flex items-center  flex-none gap-6 ml-4">
-        <Link className="font-bold" to="/features">
-          Create Group
-        </Link>
-
-        <Link className="font-bold" to="/dashboard">
-          Dashboard
-        </Link>
-
-        {/* Theme Toggle */}
         <div className="flex items-center gap-2 mr-4">
           <button
             onClick={toggleTheme}
@@ -55,7 +42,6 @@ const NavBar = () => {
             title={`Switch to ${theme === "winter" ? "forest" : "winter"} theme`}
           >
             {theme === "winter" ? (
-              // Moon Icon
               <svg
                 className="w-6 h-6 fill-current"
                 xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +50,6 @@ const NavBar = () => {
                 <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Z" />
               </svg>
             ) : (
-              // Sun Icon
               <svg
                 className="w-6 h-6 fill-current"
                 xmlns="http://www.w3.org/2000/svg"
@@ -74,9 +59,10 @@ const NavBar = () => {
               </svg>
             )}
           </button>
+
+         
         </div>
 
-        {/* User Dropdown */}
         <div className="dropdown dropdown-end">
           <label
             tabIndex={0}
@@ -112,7 +98,7 @@ const NavBar = () => {
             {isGuest ? (
               <li>
                 <Link to="/login" className="text-primary hover:bg-primary/10">
-                  Login / Register
+                  Login
                 </Link>
               </li>
             ) : (

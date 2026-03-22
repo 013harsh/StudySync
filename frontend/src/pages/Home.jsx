@@ -26,25 +26,17 @@ const features = [
 const Home = () => {
   return (
     <div className="flex flex-col overflow-x-hidden">
-      {/* ══════════════════════════════════════
-          HERO  — screen 1
-      ══════════════════════════════════════ */}
-      <section className="relative flex items-stretch min-h-screen overflow-hidden bg-base-100">
-        {/* ── Background removed for a clean, professional look ── */}
-
-        {/* ── Top-left badge ── */}
-        <div className="absolute z-10 top-6 left-8">
-          <span className="text-xs font-semibold tracking-[0.25em] uppercase text-base-content/40">
+      <section className="relative flex items-stretch min-h-screen overflow-hidden bg-base-100 ">
+        <div className="absolute z-10 top-9 left-8">
+          <span className="text-xs font-bold tracking-[0.25em] uppercase text-base-content/40">
             The Future of Studying
           </span>
         </div>
 
-        {/* ── Left column — text + CTA ── */}
-        <div className="z-10 flex flex-col justify-center w-full px-8 pt-24 pb-16 md:px-16 lg:px-24 md:w-1/2">
-          {/* Headline */}
+        <div className="z-10 flex flex-col justify-center w-full px-8 pt-20 pb-16 md:px-16 lg:px-24 md:w-1/2">
           <h1
-            className="font-black leading-none tracking-tight uppercase text-base-content"
-            style={{ fontSize: "clamp(3rem, 8vw, 6.5rem)" }}
+            className="font-black leading-none tracking-tight uppercase text-base-content "
+            style={{ fontSize: "clamp(2rem, 6vw, 6.5rem)" }}
           >
             WELCOME TO
             <br />
@@ -60,39 +52,28 @@ const Home = () => {
             <span className="text-base-content">SYNC</span>
           </h1>
 
-          {/* Animated accent bar */}
           <div className="flex items-center gap-3 my-7">
-            <div className="h-[3px] w-14 rounded-full bg-primary" />
+            <div className="h-[3px] w-10 rounded-full bg-primary" />
             <span className="text-xs font-semibold tracking-[0.3em] uppercase text-primary/80">
               Learn · Collaborate · Excel
             </span>
           </div>
 
-          {/* Tagline */}
           <p className="max-w-sm text-base leading-relaxed md:text-lg text-base-content/65">
             Your all-in-one academic companion — plan smarter, collaborate
             effortlessly, and watch your grades rise.
           </p>
 
-          {/* CTA buttons */}
           <div className="flex flex-col gap-4 mt-10 sm:flex-row">
             <Link
-              // to="/login?redirect=/features"
-              to="/features"
+              to="/Dashboard"
               className="transition-transform duration-300 shadow-lg btn btn-primary btn-lg hover:scale-105"
             >
               Get Started your study
             </Link>
-            <Link
-              to="/login"
-              className="transition-all duration-300 border btn btn-ghost btn-lg border-base-content/20 hover:border-primary hover:scale-105"
-            >
-              Login
-            </Link>
           </div>
 
-          {/* Scroll hint */}
-          <div className="flex items-center gap-2 mt-14 text-base-content/35 animate-bounce">
+          <div className="flex items-center gap-2 mt-8 text-base-content/35 animate-bounce">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-4 h-4"
@@ -113,11 +94,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* ── Right column — illustration + decorative boxes ── */}
         <div className="relative items-center justify-center hidden overflow-hidden border-l md:flex md:w-1/2 border-base-300">
-          {/* Decorations removed for a cleaner look */}
-
-          {/* Illustration */}
           <img
             src="/study_illustration.png"
             alt="Student studying illustration"
@@ -127,14 +104,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════
-          FEATURES + CTA  — screen 2
-      ══════════════════════════════════════ */}
-      <section className="relative px-6 py-20 overflow-hidden bg-base-100">
-        {/* Background grid removed for a clean, solid look */}
-
+      <section className="relative px-6 pb-20 overflow-hidden bg-base-100">
         <div className="relative z-10 max-w-5xl mx-auto">
-          {/* Section header */}
           <div className="text-center mb-14">
             <span className="text-xs font-semibold tracking-[0.3em] uppercase text-primary">
               Core Features
@@ -147,14 +118,12 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Feature cards */}
           <div className="grid grid-cols-1 gap-5 mb-16 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((f) => (
               <div
                 key={f.title}
                 className="relative p-6 overflow-hidden transition-all duration-300 border group rounded-2xl bg-base-200 border-base-300 hover:border-primary/50 hover:-translate-y-1"
               >
-                {/* card inner glow on hover */}
                 <div
                   className="absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100 rounded-2xl"
                   style={{

@@ -7,15 +7,17 @@ import Account from "../pages/Account.jsx";
 import Features from "../pages/Features.jsx";
 import Room from "../pages/Room.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
-import About from "../pages/About.jsx";
-import Terms from "../pages/Terms.jsx";
-import Privacy from "../pages/Privacy.jsx";
-import Contact from "../pages/Contact.jsx";
+import About from "../pages/footer/About.jsx";
+import Terms from "../pages/footer/Terms.jsx";
+import Privacy from "../pages/footer/Privacy.jsx";
+import Contact from "../pages/footer/Contact.jsx";
+import Hero from "../components/Hero.jsx";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Hero />} />
+      <Route path="/Home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Registration />} />
       <Route path="/about" element={<About />} />
