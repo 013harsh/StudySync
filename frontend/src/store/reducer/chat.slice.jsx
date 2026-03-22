@@ -5,7 +5,7 @@ const ChatSlice = createSlice({
 
   initialState: {
     messages: [],
-    activeChat: [],
+    activeChat: null,
     isTyping: false,
     onlineUsers: [],
     typingUser: null,

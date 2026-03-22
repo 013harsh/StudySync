@@ -2,8 +2,6 @@ import { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { joinGroup } from "../../store/action/group.action";
 
-const API = "http://localhost:3000";
-
 const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
   const dialogRef = useRef(null);
 
@@ -27,10 +25,17 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
   const dispatch = useDispatch();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    
+    const trimmed = code.trim();
+    if (!trimmed) {
+      setError("Invite code is required");
+      return;
+    }
+
+    setLoading(true);
+    
     try {
-      // Dispatch Redux action (assuming you update joinGroup to accept the code if needed)
-      // Note: your action currently accepts `groupId`, if you changed your API to accept `inviteCode`,
-      // you'll need to pass `inviteCode: trimmed` to your Redux action!
       const result = await dispatch(joinGroup(trimmed));
 
       setSuccess("You joined the group successfully!");

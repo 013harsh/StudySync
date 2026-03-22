@@ -1,7 +1,6 @@
 import axios from "axios";
 
 import {
-  // editMessage,
   getMessages,
   deleteMessage,
 } from "../reducer/chat.slice";
@@ -27,4 +26,5 @@ export const removeMessage = (messageId) => async (dispatch) => {
     console.log("chat-error", error);
   }
 };
+
 // export const UpdateMessage = (data) => async (dispatch) => {};

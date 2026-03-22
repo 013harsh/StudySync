@@ -10,6 +10,8 @@ import { fetchMessage } from "../store/action/chat.action";
 const API = import.meta.env.VITE_API_URL;
 
 const Room = () => {
+  const reduxMessages = useSelector((state) => state.chat.messages);
+
   const { groupId } = useParams();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -23,7 +25,11 @@ const Room = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("chat");
   const [timerSession, setTimerSession] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [newMessages, setNewMessages] = useState([]);
+  const messages = [...reduxMessages, ...newMessages].filter(
+    (msg, index, self) => index === self.findIndex((m) => m._id === msg._id),
+  );
+
   const [chatInput, setChatInput] = useState("");
 
   const myMember = members.find(
@@ -61,6 +67,11 @@ const Room = () => {
 
     fetchGroup();
   }, [groupId, dispatch]);
+
+  //not resetting on group change
+  useEffect(() => {
+    setNewMessages([]);
+  }, [groupId]);
 
   //socket connection
   useEffect(() => {
@@ -133,7 +144,7 @@ const Room = () => {
     });
 
     socket.on("receive-message", (data) => {
-      setMessages((prev) => [...prev, data]);
+      setNewMessages((prev) => [...prev, data]);
     });
 
     return () => {
@@ -254,13 +265,15 @@ const Room = () => {
                       <p className="text-sm">Chat messages will appear here</p>
                     </div>
                   ) : (
-                    messages.map((msg, i) => (
+                    messages.map((msg) => (
                       <div
-                        key={i}
+                        key={msg._id}
                         className={`chat ${msg.sender._id === user?.id ? "chat-end" : "chat-start"}`}
                       >
                         <div className="text-xs opacity-50 chat-header">
-                          {msg.sender.fullName}
+                          {typeof msg.sender.fullName === 'string' 
+                            ? msg.sender.fullName 
+                            : `${msg.sender.fullName?.firstName || ''} ${msg.sender.fullName?.lastName || ''}`.trim()}
                         </div>
                         <div className="chat-bubble">{msg.text}</div>
                       </div>

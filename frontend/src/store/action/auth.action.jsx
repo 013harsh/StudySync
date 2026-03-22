@@ -36,7 +36,6 @@ export const userLogout = (data) => async (dispatch) => {
     await axios.post("/api/auth/logout", data, {
       withCredentials: true,
     });
-    console.log();
     dispatch(logout());
   } catch (error) {
     console.log("error", error);

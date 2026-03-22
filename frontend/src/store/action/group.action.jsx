@@ -33,8 +33,9 @@ export const joinGroup = (inviteCode) => async (dispatch) => {
     dispatch(addGroup(res.data.group));
     return res.data;
   } catch (error) {
-    console.log(error);
-    throw error.response?.data || error;
+    console.error("Error joining group:", error);
+    const errorMessage = error.response?.data?.message || error.message || "Failed to join group";
+    throw new Error(errorMessage);
   }
 };
 export const fetchMyGroups = () => async (dispatch) => {
