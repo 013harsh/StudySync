@@ -16,7 +16,6 @@ export const userRegister = (data) => async (dispatch) => {
     return { success: false, error: message };
   }
 };
-
 export const userLogin = (data) => async (dispatch) => {
   try {
     const res = await axios.post("/api/auth/login", data, {

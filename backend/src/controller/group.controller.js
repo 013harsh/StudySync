@@ -62,7 +62,6 @@ const createGroup = async (req, res) => {
     });
   }
 };
-
 const deleteGroup = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -101,7 +100,6 @@ const deleteGroup = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-//join Group
 const joinGroup = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -155,7 +153,6 @@ const joinGroup = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-// leave group
 const leaveGroup = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -220,8 +217,6 @@ const leaveGroup = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-// ─── Get Group Members ──────────────────────────────────────────────────────
-// GET /api/group/:id/members
 const getGroupMembers = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -268,9 +263,6 @@ const getGroupMembers = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
-// ─── Get My Groups ─────────────────────────────────────────────────────────
-// GET /api/group/my-groups
 const getMyGroups = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -309,7 +301,6 @@ const getMyGroups = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 module.exports = {
   createGroup,
   deleteGroup,

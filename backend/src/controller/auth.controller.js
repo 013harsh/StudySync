@@ -64,7 +64,6 @@ async function registerUser(req, res) {
     return res.status(500).json({ message: "something went wrong" });
   }
 }
-
 async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
@@ -118,7 +117,6 @@ async function loginUser(req, res) {
     return res.status(500).json({ message: "something went wrong" });
   }
 }
-
 async function logout(req, res) {
   try {
     res.clearCookie("token");
@@ -128,7 +126,6 @@ async function logout(req, res) {
     return res.status(500).json({ message: "something went wrong" });
   }
 }
-
 async function updateProfile(req, res) {
   try {
     const { firstName, lastName } = req.body;
@@ -187,7 +184,6 @@ async function updateProfile(req, res) {
       .json({ message: "Something went wrong updating profile" });
   }
 }
-
 async function getMe(req, res) {
   try {
     const user = await userModel.findById(req.user.id).select("-password");

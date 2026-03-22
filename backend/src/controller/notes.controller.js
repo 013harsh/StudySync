@@ -3,13 +3,10 @@ const Note = require("../model/notes.model");
 const Group = require("../model/group.model");
 const { getIO } = require("../sockets/io");
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
+
 const isMember = async (groupId, userId) => {
   return Group.findOne({ _id: groupId, "members.user": userId });
 };
-
-// ─── Get Note ─────────────────────────────────────────────────────────────────
-// GET /api/notes/groups/:id
 const getNote = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -40,9 +37,6 @@ const getNote = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
-// ─── Save Note ────────────────────────────────────────────────────────────────
-// PUT /api/notes/groups/:id
 const saveNote = async (req, res) => {
   try {
     const userId = req.user?.id;

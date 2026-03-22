@@ -21,7 +21,6 @@ export const deleteGroup = (groupId) => async (dispatch) => {
     console.log(error);
   }
 };
-
 export const joinGroup = (inviteCode) => async (dispatch) => {
   try {
     const res = await axios.post(
@@ -49,6 +48,5 @@ export const fetchMyGroups = () => async (dispatch) => {
     console.log("Error fetching my groups: ", error.message);
   }
 };
-
 // export const leaveGroup = () => async () => {};
 // export const getGroupMembers = () => async () => {};

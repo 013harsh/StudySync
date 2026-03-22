@@ -43,7 +43,6 @@ const getMessages = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 const deleteMessage = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -82,7 +81,6 @@ const deleteMessage = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 const editMessage = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -131,7 +129,6 @@ const editMessage = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 const getUnreadCount = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -151,5 +148,4 @@ const getUnreadCount = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 module.exports = { getMessages, deleteMessage, editMessage, getUnreadCount };
