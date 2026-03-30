@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const features = [
   {
@@ -23,84 +24,177 @@ const features = [
   },
 ];
 
+const DraggableCard = ({ icon, title, subtitle, initialPosition }) => {
+  const [position, setPosition] = useState(initialPosition);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  return (
+    <div
+      className={`absolute p-6 border shadow-2xl card bg-base-100 border-base-300 w-72 cursor-move select-none ${!isDragging ? "animate-float" : ""}`}
+      style={{
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        transition: isDragging ? "none" : "transform 0.3s ease",
+      }}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10">
+          <span className="text-2xl">{icon}</span>
+        </div>
+        <div>
+          <div className="text-sm font-bold text-base-content">{title}</div>
+          <div className="text-xs text-base-content/60">{subtitle}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Home = () => {
   return (
     <div className="flex flex-col overflow-x-hidden">
-      <section className="relative flex items-stretch min-h-screen overflow-hidden bg-base-100 ">
-        <div className="absolute z-10 top-9 left-8">
-          <span className="text-xs font-bold tracking-[0.25em] uppercase text-base-content/40">
-            The Future of Studying
-          </span>
+      <section className="relative flex items-center min-h-screen overflow-hidden bg-gradient-to-br from-base-100 via-base-200 to-base-100">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-40 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 right-10 w-64 h-64 bg-accent/5 rounded-full blur-2xl" />
         </div>
 
-        <div className="z-10 flex flex-col justify-center w-full px-8 pt-20 pb-16 md:px-16 lg:px-24 md:w-1/2">
-          <h1
-            className="font-black leading-none tracking-tight uppercase text-base-content "
-            style={{ fontSize: "clamp(2rem, 6vw, 6.5rem)" }}
+        <div className="container relative z-10 px-6 py-20 mx-auto lg:px-12">
+          <div className="grid items-center grid-cols-1 gap-12 lg:grid-cols-2">
+            {/* Left Content */}
+            <div className="max-w-2xl">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 border rounded-full bg-primary/10 border-primary/20">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-xs font-bold tracking-widest uppercase text-primary">
+                  The Future of Studying
+                </span>
+              </div>
+
+              {/* Main Heading */}
+              <h1 className="mb-6 font-black leading-tight tracking-tight text-base-content font-['Inter',sans-serif]">
+                <span className="block text-5xl md:text-6xl lg:text-7xl">
+                  WELCOME TO
+                </span>
+                <span className="block mt-2 text-6xl md:text-7xl lg:text-8xl text-primary">
+                  STUDYSYNC
+                </span>
+              </h1>
+
+              {/* Tagline */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-[2px] w-12 rounded-full bg-primary" />
+                <span className="text-sm font-semibold tracking-widest uppercase text-primary/80 font-['Poppins',sans-serif]">
+                  Learn · Collaborate · Excel
+                </span>
+              </div>
+
+              {/* Description */}
+              <p className="mb-8 text-lg leading-relaxed md:text-xl text-base-content/70 font-['Inter',sans-serif]">
+                Your all-in-one academic companion. Plan smarter, collaborate
+                effortlessly, and achieve excellence in your studies.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col gap-4 mb-10 sm:flex-row">
+                <Link
+                  to="/dashboard"
+                  className="shadow-lg btn btn-primary btn-lg hover:scale-105 transition-transform"
+                >
+                  Get Started
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </Link>
+                <Link
+                  to="/features"
+                  className="btn btn-outline btn-lg hover:scale-105 transition-transform"
+                >
+                  Explore Features
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative hidden lg:flex items-center justify-center h-[600px]">
+              <div className="relative w-full h-full">
+                <DraggableCard
+                  icon="📚"
+                  title="Study Groups"
+                  subtitle="Join & Collaborate"
+                  initialPosition={{ x: 200, y: 120 }}
+                />
+
+                <DraggableCard
+                  icon="📈"
+                  title="Track Progress"
+                  subtitle="Real-time Analytics"
+                  initialPosition={{ x: 300, y: 280 }}
+                />
+
+                <DraggableCard
+                  icon="🎯"
+                  title="Smart Planning"
+                  subtitle="Achieve Your Goals"
+                  initialPosition={{ x: 250, y: 450 }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute flex flex-col items-center gap-2 -translate-x-1/2 bottom-8 left-1/2 text-base-content/40 animate-bounce">
+          <span className="text-xs tracking-widest uppercase">Scroll</span>
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            WELCOME TO
-            <br />
-            <span
-              className="text-primary"
-              style={{
-                WebkitTextStroke: "2px oklch(var(--p))",
-                textShadow: "0 0 40px oklch(var(--p)/0.35)",
-              }}
-            >
-              STUDY
-            </span>
-            <span className="text-base-content">SYNC</span>
-          </h1>
-
-          <div className="flex items-center gap-3 my-7">
-            <div className="h-[3px] w-10 rounded-full bg-primary" />
-            <span className="text-xs font-semibold tracking-[0.3em] uppercase text-primary/80">
-              Learn · Collaborate · Excel
-            </span>
-          </div>
-
-          <p className="max-w-sm text-base leading-relaxed md:text-lg text-base-content/65">
-            Your all-in-one academic companion — plan smarter, collaborate
-            effortlessly, and watch your grades rise.
-          </p>
-
-          <div className="flex flex-col gap-4 mt-10 sm:flex-row">
-            <Link
-              to="/Dashboard"
-              className="transition-transform duration-300 shadow-lg btn btn-primary btn-lg hover:scale-105"
-            >
-              Get Started your study
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-2 mt-8 text-base-content/35 animate-bounce">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-            <span className="text-[11px] tracking-[0.3em] uppercase">
-              Scroll to explore
-            </span>
-          </div>
-        </div>
-
-        <div className="relative items-center justify-center hidden overflow-hidden border-l md:flex md:w-1/2 border-base-300">
-          <img
-            src="/study_illustration.png"
-            alt="Student studying illustration"
-            className="relative z-10 w-[82%] max-w-lg object-contain drop-shadow-2xl"
-            style={{ filter: "drop-shadow(0 20px 40px oklch(var(--p)/0.18))" }}
-          />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
         </div>
       </section>
 

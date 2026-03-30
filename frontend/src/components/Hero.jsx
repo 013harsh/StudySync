@@ -50,10 +50,10 @@ const THEMES = {
 
 // Thresholds as a plain sorted array — cheap to scan
 const STATUS_STEPS = [
-  [0,   "Initializing workspace..."],
-  [25,  "Loading study modules..."],
-  [50,  "Preparing your dashboard..."],
-  [80,  "Almost ready..."],
+  [0, "Initializing workspace..."],
+  [25, "Loading study modules..."],
+  [50, "Preparing your dashboard..."],
+  [80, "Almost ready..."],
   [100, "Welcome to StudySync"],
 ];
 
@@ -62,13 +62,13 @@ const RING_R = 88;
 const RING_C = 2 * Math.PI * RING_R;
 
 // Framer-motion transition objects — defined once, not inline
-const RING_TRANSITION   = { duration: 0.1, ease: "linear" };
+const RING_TRANSITION = { duration: 0.1, ease: "linear" };
 const REVEAL_TRANSITION = { duration: 0.6, ease: [0.34, 1.2, 0.64, 1] };
-const FADE_TRANSITION   = { delay: 0.2, duration: 0.5 };
-const TITLE_TRANSITION  = { delay: 0.3, duration: 0.5 };
-const LINE_TRANSITION   = { delay: 0.4, duration: 0.5 };
+const FADE_TRANSITION = { delay: 0.2, duration: 0.5 };
+const TITLE_TRANSITION = { delay: 0.3, duration: 0.5 };
+const LINE_TRANSITION = { delay: 0.4, duration: 0.5 };
 const STATUS_TRANSITION = { duration: 0.2 };
-const EXIT_TRANSITION   = { duration: 0.4, ease: "easeOut" };
+const EXIT_TRANSITION = { duration: 0.4, ease: "easeOut" };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getTheme() {
@@ -115,11 +115,20 @@ const Ring = memo(function Ring({ progress, t }) {
       </defs>
 
       {/* Track */}
-      <circle cx="0" cy="0" r={RING_R} fill="none" stroke={t.trackColor} strokeWidth="3" />
+      <circle
+        cx="0"
+        cy="0"
+        r={RING_R}
+        fill="none"
+        stroke={t.trackColor}
+        strokeWidth="3"
+      />
 
       {/* Progress arc */}
       <motion.circle
-        cx="0" cy="0" r={RING_R}
+        cx="0"
+        cy="0"
+        r={RING_R}
         fill="none"
         stroke={t.primary}
         strokeWidth="3"
@@ -137,12 +146,33 @@ const Ring = memo(function Ring({ progress, t }) {
         transition={RING_TRANSITION}
         style={{ transformOrigin: "0 0" }}
       >
-        <circle cx="0" cy={-RING_R} r="5" fill={t.primary} filter="url(#soft-glow)" />
+        <circle
+          cx="0"
+          cy={-RING_R}
+          r="5"
+          fill={t.primary}
+          filter="url(#soft-glow)"
+        />
       </motion.g>
 
       {/* Static center decoration */}
-      <circle cx="0" cy="0" r="38" fill="none" stroke={t.primaryDim} strokeWidth="1" />
-      <circle cx="0" cy="0" r="26" fill="none" stroke={t.trackColor} strokeWidth="1" strokeDasharray="3 6" />
+      <circle
+        cx="0"
+        cy="0"
+        r="38"
+        fill="none"
+        stroke={t.primaryDim}
+        strokeWidth="1"
+      />
+      <circle
+        cx="0"
+        cy="0"
+        r="26"
+        fill="none"
+        stroke={t.trackColor}
+        strokeWidth="1"
+        strokeDasharray="3 6"
+      />
     </svg>
   );
 });
@@ -153,7 +183,8 @@ const GlowBg = memo(function GlowBg({ primaryGlow }) {
     <div
       style={{
         position: "absolute",
-        width: 380, height: 380,
+        width: 380,
+        height: 380,
         borderRadius: "50%",
         background: `radial-gradient(circle, ${primaryGlow} 0%, transparent 70%)`,
         pointerEvents: "none",
@@ -164,12 +195,12 @@ const GlowBg = memo(function GlowBg({ primaryGlow }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Intro() {
-  const navigate  = useNavigate();
-  const t         = useLiveTheme();
+  const navigate = useNavigate();
+  const t = useLiveTheme();
   const [progress, setProgress] = useState(0);
-  const [done, setDone]         = useState(false);
-  const rafRef    = useRef(null);
-  const startRef  = useRef(null);
+  const [done, setDone] = useState(false);
+  const rafRef = useRef(null);
+  const startRef = useRef(null);
 
   // Memoized status — only recomputes when progress crosses a threshold
   const statusMsg = useMemo(() => getStatus(progress), [progress]);
@@ -179,9 +210,9 @@ export default function Intro() {
     startRef.current = performance.now();
 
     const tick = (now) => {
-      const elapsed  = now - startRef.current;
-      const raw      = Math.min((elapsed / LOAD_MS) * 100, 100);
-      const floored  = Math.floor(raw);
+      const elapsed = now - startRef.current;
+      const raw = Math.min((elapsed / LOAD_MS) * 100, 100);
+      const floored = Math.floor(raw);
 
       setProgress(floored);
 
@@ -205,7 +236,9 @@ export default function Intro() {
           exit={{ opacity: 0, scale: 0.96 }}
           transition={EXIT_TRANSITION}
           style={{
-            position: "fixed", inset: 0, zIndex: 9999,
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
             background: t.bg,
             display: "flex",
             flexDirection: "column",
@@ -236,23 +269,27 @@ export default function Intro() {
               gap: 3,
             }}
           >
-            <span style={{
-              color: t.primary,
-              fontSize: "3.2rem",
-              fontWeight: 700,
-              fontFamily: "'Courier New', monospace",
-              lineHeight: 1,
-              letterSpacing: "-0.03em",
-              textShadow: `0 0 30px ${t.primaryGlow}`,
-            }}>
+            <span
+              style={{
+                color: t.primary,
+                fontSize: "3.2rem",
+                fontWeight: 700,
+                fontFamily: "'Courier New', monospace",
+                lineHeight: 1,
+                letterSpacing: "-0.03em",
+                textShadow: `0 0 30px ${t.primaryGlow}`,
+              }}
+            >
               {String(progress).padStart(3, "0")}
             </span>
-            <span style={{
-              color: t.textDim,
-              fontSize: "1rem",
-              fontFamily: "monospace",
-              marginBottom: 6,
-            }}>
+            <span
+              style={{
+                color: t.textDim,
+                fontSize: "1rem",
+                fontFamily: "monospace",
+                marginBottom: 6,
+              }}
+            >
               %
             </span>
           </motion.div>
@@ -282,7 +319,8 @@ export default function Intro() {
             animate={{ scaleX: 1 }}
             transition={LINE_TRANSITION}
             style={{
-              width: 60, height: 2,
+              width: 60,
+              height: 2,
               background: t.primary,
               margin: "0 0 16px",
               borderRadius: 2,
@@ -312,11 +350,16 @@ export default function Intro() {
           </AnimatePresence>
 
           {/* Bottom bar */}
-          <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0,
-            height: 3,
-            background: t.trackColor,
-          }}>
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: t.trackColor,
+            }}
+          >
             <motion.div
               animate={{ width: `${progress}%` }}
               transition={RING_TRANSITION}

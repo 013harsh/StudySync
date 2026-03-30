@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { userLogin } from "../store/action/auth.action";
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -131,12 +131,12 @@ const Login = () => {
 
           <p className="mt-6 text-sm text-center text-base-content/70">
             Not a member?{" "}
-            <Link
-              to="/register"
+            <button
+              onClick={() => navigate("/register")}
               className="font-medium link link-primary hover:text-primary-focus"
             >
               Register now
-            </Link>
+            </button>
           </p>
         </div>
       </div>

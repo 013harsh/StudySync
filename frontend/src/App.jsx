@@ -6,14 +6,20 @@ import { useTheme } from "./context/ThemeContext";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { usercurrent } from "./store/action/auth.action";
+import { useLocation } from "react-router-dom";
 
 export const App = () => {
   const { theme } = useTheme();
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  // Hide footer on room pages
+  const hideFooter = location.pathname.startsWith("/room");
 
   useEffect(() => {
     dispatch(usercurrent());
   }, []);
+  
   return (
     <ErrorBoundary>
       <div
@@ -22,7 +28,7 @@ export const App = () => {
       >
         <NavBar />
         <Routes />
-        <Footer />
+        {!hideFooter && <Footer />}
       </div>
     </ErrorBoundary>
   );

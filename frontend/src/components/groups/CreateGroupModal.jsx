@@ -1,18 +1,21 @@
 import { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { createGroup } from "../../store/action/group.action";
+import { useNavigate } from "react-router-dom";
+
 
 const API = "http://localhost:3000";
 
 const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
   const dialogRef = useRef(null);
-
+  
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("study");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+    const navigate = useNavigate();
 
   const reset = () => {
     setName("");
@@ -31,9 +34,9 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
   const dispatch = useDispatch();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      // Dispatch the Redux action
-      await dispatch(
+      const group = await dispatch(
         createGroup({
           name: name.trim(),
           description: description.trim(),
@@ -42,12 +45,12 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
       );
 
       setSuccess(`Group created successfully!`);
-      onSuccess?.(); // Optional callback
-
+      onSuccess?.(); 
       setTimeout(() => {
         close();
         reset();
-      }, 1800);
+        navigate(`/room/${group._id}`);
+      }, 1000); // Shorter timeout for faster perceived performance
     } catch (err) {
       setError(err.message || "Failed to create group");
     } finally {

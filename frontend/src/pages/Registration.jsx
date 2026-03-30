@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { userRegister } from "../store/action/auth.action";
 
@@ -182,12 +182,12 @@ const Registration = () => {
 
           <p className="mt-6 text-sm text-center text-base-content/70">
             Already have an account?{" "}
-            <Link
-              to="/login"
+            <button
+              onClick={() => navigate("/login")}
               className="font-medium link link-primary hover:text-primary-focus"
             >
               Sign in
-            </Link>
+            </button>
           </p>
         </div>
       </div>

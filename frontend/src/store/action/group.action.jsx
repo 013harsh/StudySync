@@ -5,8 +5,10 @@ export const createGroup = (data) => async (dispatch) => {
   try {
     const res = await axios.post("/api/group/create", data);
     dispatch(addGroup(res.data.group));
+    return res.data.group; // Return to allow navigation
   } catch (error) {
     console.log("error occured while creating group", error.message);
+    throw error;
   }
 };
 export const deleteGroup = (groupId) => async (dispatch) => {

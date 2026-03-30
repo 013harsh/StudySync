@@ -6,12 +6,12 @@ const noteSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
       required: true,
-      unique: true, // one note per group
+      unique: true, 
       index: true,
     },
 
     content: {
-      type: Object, // Quill Delta JSON  { ops: [...] }
+      type: Object, 
       default: { ops: [] },
     },
 

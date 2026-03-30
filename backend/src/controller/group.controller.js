@@ -81,7 +81,7 @@ const deleteGroup = async (req, res) => {
     }
     // authorization check
 
-    if (group.createdBy.toString() !== userId) {
+    if (group.createdBy.toString() !== userId.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
     // delete group
@@ -124,7 +124,7 @@ const joinGroup = async (req, res) => {
 
     // Check if user is already a member
     const alreadyMember = group.members.some(
-      (m) => m.user.toString() === userId,
+      (m) => m.user.toString() === userId.toString(),
     );
 
     if (alreadyMember) {
@@ -173,7 +173,7 @@ const leaveGroup = async (req, res) => {
     }
 
     // check user is a member
-    const member = group.members.find((m) => m.user.toString() === userId);
+    const member = group.members.find((m) => m.user.toString() === userId.toString());
     if (!member) {
       return res
         .status(403)
@@ -183,7 +183,7 @@ const leaveGroup = async (req, res) => {
     const isAdmin = member.role === "admin";
 
     // remove user from members
-    group.members = group.members.filter((m) => m.user.toString() !== userId);
+    group.members = group.members.filter((m) => m.user.toString() !== userId.toString());
 
     // if no members remain, delete the group entirely
     if (group.members.length === 0) {

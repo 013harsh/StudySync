@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 const ThemeContext = createContext(null);
 
 export const ThemeProvider = ({ children }) => {
-  const themes = ["forest", "winter", "dark", "cupcake"];
+  const themes = ["winter", "forest"];
 
   const getInitialTheme = () => {
     try {
