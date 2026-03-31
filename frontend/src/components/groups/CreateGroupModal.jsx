@@ -62,9 +62,9 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
     <>
       <button
         onClick={open}
-        className="btn btn-primary btn-lg rounded-full font-bold w-full"
+        className="btn btn-primary rounded-xl font-bold w-full text-sm h-10 min-h-0"
       >
-        📚 Create Study Group
+        + Create Group
       </button>
 
       <dialog

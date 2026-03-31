@@ -38,7 +38,6 @@ const Dashboard = () => {
     loadGroups();
   }, [dispatch]);
 
-  /* derived */
   const firstName = user?.fullName?.firstName || "Student";
   const lastName = user?.fullName?.lastName || "";
   const email = user?.email || "—";

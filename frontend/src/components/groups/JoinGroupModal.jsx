@@ -56,9 +56,9 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
     <>
       <button
         onClick={open}
-        className="btn btn-secondary btn-lg rounded-full font-bold w-full"
+        className="btn btn-secondary rounded-xl font-bold w-full text-sm h-10 min-h-0"
       >
-        🔑 Join with Code
+        → Join Group
       </button>
 
       <dialog

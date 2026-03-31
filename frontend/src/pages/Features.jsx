@@ -3,120 +3,120 @@ import { motion, AnimatePresence } from "framer-motion";
 import CreateGroupModal from "../components/groups/CreateGroupModal";
 import JoinGroupModal from "../components/groups/JoinGroupModal";
 
-/* ─── Shared Animation Variants ─── */
+/* ─── Animation Variants ─── */
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
   },
 };
 
 const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
+  hidden: { y: 24, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { type: "spring", stiffness: 100 },
+    transition: { type: "spring", stiffness: 90, damping: 16 },
   },
 };
 
-/* ─── Professional Content Config ─── */
+/* ─── Data ─── */
 const CORE_FEATURES = [
   {
     icon: "🎯",
     title: "Focused Collaboration",
-    desc: "Create dedicated spaces for specific subjects or projects. No more scattered WhatsApp groups.",
+    desc: "Dedicated spaces per subject. No more chaotic WhatsApp threads.",
     color: "primary",
   },
   {
     icon: "🤝",
     title: "Instant Access",
-    desc: "Join any group immediately with a unique invite code. No waiting for admin approval.",
+    desc: "Join any group in seconds with a unique invite code.",
     color: "secondary",
   },
   {
     icon: "🔒",
     title: "Private & Secure",
-    desc: "Only members with the code can access your group's notes and chat history.",
+    desc: "Only code holders can view your group's notes and chat.",
     color: "accent",
   },
   {
     icon: "⚡",
     title: "Real-time Sync",
-    desc: "Everything updates instantly across all members' devices as you collaborate.",
+    desc: "Everything updates live across every member's device.",
     color: "info",
   },
 ];
 
 const WORKFLOW = [
   {
-    title: "Generate Code",
-    desc: "Create a group and get a unique 6-character invite code.",
     step: 1,
+    title: "Create & Generate",
+    desc: "Start a group and receive a unique 6-character invite code instantly.",
   },
   {
-    title: "Share with Peers",
-    desc: "Distribute the code to your classmates via email or text.",
     step: 2,
+    title: "Share with Peers",
+    desc: "Send your code to classmates via any channel — email, text, or chat.",
   },
   {
-    title: "Sync & Study",
-    desc: "Start chatting and editing shared notes in real-time.",
     step: 3,
+    title: "Sync & Study",
+    desc: "Collaborate on shared notes and chat in real-time, together.",
   },
 ];
 
-/* ─── Modular Components ─── */
-
 const HeroSection = () => (
-  <section className="relative pt-16 pb-6 overflow-hidden sm:pt-24 sm:pb-8 bg-base-100">
+  <section className="relative pt-0 pb-4 overflow-hidden sm:pt-28 bg-base-100">
     <div className="container relative z-10 px-6 mx-auto text-center">
+      {/* Badge */}
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
+        initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="inline-flex items-center gap-2 px-4 py-2 mb-8 border rounded-full bg-primary/10 border-primary/20 text-primary"
+        transition={{ duration: 0.45 }}
+        className="inline-flex items-center gap-2 px-4 py-1.5 mb-7 border rounded-full bg-primary/8 border-primary/20 text-primary"
       >
-        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-        <span className="text-xs font-bold tracking-widest uppercase">
-          Professional Workspace
+        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+        <span className="text-[11px] font-bold tracking-[0.15em] uppercase">
+          Professional Academic Workspace
         </span>
       </motion.div>
-
       <motion.h1
-        initial={{ y: 20, opacity: 0 }}
+        initial={{ y: 22, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="text-4xl font-black leading-tight tracking-tight md:text-6xl lg:text-7xl text-base-content"
+        transition={{ delay: 0.15 }}
+        className="text-4xl font-black leading-[1.1] tracking-tight md:text-6xl lg:text-7xl text-base-content "
       >
-        Simplify Your Study <br />
+        Your Study Network <br />
         <span className="relative inline-block text-primary">
-          Network
+          Simplified
           <svg
             className="absolute left-0 w-full -bottom-2"
-            viewBox="0 0 100 20"
+            viewBox="0 0 200 12"
             preserveAspectRatio="none"
           >
             <path
-              d="M0 10 Q25 0 50 10 T100 10"
+              d="M0 8 Q50 0 100 8 T200 8"
               fill="none"
               stroke="currentColor"
-              strokeWidth="4"
-              className="text-primary/30"
+              strokeWidth="3"
+              strokeLinecap="round"
+              opacity="0.35"
             />
           </svg>
         </span>
       </motion.h1>
 
+      {/* Subtext */}
       <motion.p
-        initial={{ y: 20, opacity: 0 }}
+        initial={{ y: 22, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="max-w-2xl mx-auto mt-8 text-lg font-medium md:text-xl text-base-content/60"
+        transition={{ delay: 0.25 }}
+        className="max-w-xl mx-auto mt-6 text-base leading-relaxed md:text-lg text-base-content/55"
       >
-        The premium hub for modern students. Create focused study groups,
-        collaborate on shared notes, and sync your academic goals.
+        The premium hub for modern students — create focused study groups,
+        collaborate on shared notes, and stay in sync with your academic goals.
       </motion.p>
     </div>
   </section>
@@ -135,69 +135,141 @@ const Features = () => {
     <div className="min-h-screen bg-base-100">
       <HeroSection />
 
-      {/* ── Main Actions Section ── */}
-      <section className="container px-6 pt-4 pb-12 mx-auto">
+      {/* ══ Action Cards ══ */}
+      <section className="container px-6 pt-6 mx-auto pb-14">
+        {/* Section label */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="flex items-center max-w-2xl gap-3 mx-auto mb-6"
+        >
+          <div className="flex-1 h-px bg-base-300" />
+          <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-base-content/40">
+            Get Started
+          </span>
+          <div className="flex-1 h-px bg-base-300" />
+        </motion.div>
+
+        {/* Cards grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="flex flex-col items-center justify-center max-w-4xl gap-8 mx-auto md:flex-row"
+          className="grid max-w-2xl grid-cols-2 gap-5 mx-auto"
         >
+          {/* ── Create Group Card ── */}
           <motion.div
             variants={itemVariants}
-            className="w-full p-1 transition-all shadow-xl md:w-1/2 rounded-3xl bg-gradient-to-br from-primary to-secondary hover:shadow-2xl"
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 280, damping: 18 }}
+            className="relative flex flex-col overflow-hidden transition-all duration-300 border shadow-md group rounded-3xl border-base-300 bg-base-100 hover:shadow-xl hover:border-primary/30"
           >
-            <div className="bg-base-100 p-8 rounded-[22px] h-full flex flex-col items-center text-center">
-              <span className="mb-4 text-5xl">🏠</span>
-              <h3 className="mb-3 text-2xl font-black">Found a Subject?</h3>
-              <p className="max-w-xs mb-8 text-sm text-base-content/60">
-                Start a new group and lead your classmates to academic success.
+            {/* Top gradient zone */}
+            <div className="relative flex flex-col items-center gap-4 px-6 pt-9 pb-7 bg-gradient-to-b from-primary/10 to-transparent">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+              <div className="absolute right-0 w-32 h-32 rounded-full pointer-events-none -top-10 bg-primary/10 blur-2xl" />
+
+              {/* Icon */}
+              <div className="relative z-10 flex items-center justify-center w-[60px] h-[60px] rounded-2xl bg-gradient-to-br from-primary to-secondary shadow-lg shadow-primary/25 text-[28px] group-hover:scale-110 group-hover:shadow-primary/40 transition-all duration-300">
+                🏠
+              </div>
+
+              {/* Title */}
+              <div className="relative z-10 text-center">
+                <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-primary/70 mb-0.5">
+                  Host a Room
+                </p>
+                <h3 className="text-[15px] font-black text-base-content leading-snug">
+                  Create Study Group
+                </h3>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex flex-col items-center flex-1 gap-4 px-6 pt-3 pb-6">
+              <p className="text-[11px] text-base-content/50 text-center leading-relaxed">
+                Start a focused group for your subject and invite your
+                classmates with a unique code.
               </p>
-              <CreateGroupModal
-                modalId="features_page_create"
-                onSuccess={setLastCreated}
-              />
+              <div className="w-full mt-auto">
+                <CreateGroupModal
+                  modalId="features_page_create"
+                  onSuccess={setLastCreated}
+                />
+              </div>
             </div>
           </motion.div>
 
+          {/* ── Join / Invite Card ── */}
           <motion.div
             variants={itemVariants}
-            className="w-full p-px shadow-md md:w-1/2 rounded-3xl bg-base-300"
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 280, damping: 18 }}
+            className="relative flex flex-col overflow-hidden transition-all duration-300 border shadow-md group rounded-3xl border-base-300 bg-base-100 hover:shadow-xl hover:border-secondary/30"
           >
-            <div className="bg-base-100 p-8 rounded-[23px] h-full flex flex-col items-center text-center">
-              <span className="mb-4 text-5xl">🔑</span>
-              <h3 className="mb-3 text-2xl font-black">Got an Invite?</h3>
-              <p className="max-w-xs mb-8 text-sm text-base-content/60">
-                Paste your unique code to join the conversation instantly.
+            {/* Top gradient zone */}
+            <div className="relative flex flex-col items-center gap-4 px-6 pt-9 pb-7 bg-gradient-to-b from-secondary/10 to-transparent">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary/40 to-transparent" />
+              <div className="absolute right-0 w-32 h-32 rounded-full pointer-events-none -top-10 bg-secondary/10 blur-2xl" />
+
+              {/* Icon */}
+              <div className="relative z-10 flex items-center justify-center w-[60px] h-[60px] rounded-2xl bg-gradient-to-br from-secondary to-accent shadow-lg shadow-secondary/25 text-[28px] group-hover:scale-110 group-hover:shadow-secondary/40 transition-all duration-300">
+                🔑
+              </div>
+
+              {/* Title */}
+              <div className="relative z-10 text-center">
+                <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-secondary/70 mb-0.5">
+                  Join a Room
+                </p>
+                <h3 className="text-[15px] font-black text-base-content leading-snug">
+                  Join with Invite Code
+                </h3>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex flex-col items-center flex-1 gap-4 px-6 pt-3 pb-6">
+              <p className="text-[11px] text-base-content/50 text-center leading-relaxed">
+                Have a code? Paste it below and jump into your study group
+                conversation instantly.
               </p>
-              <JoinGroupModal
-                modalId="features_page_join"
-                onSuccess={setLastJoined}
-              />
+              <div className="w-full mt-auto">
+                <JoinGroupModal
+                  modalId="features_page_join"
+                  onSuccess={setLastJoined}
+                />
+              </div>
             </div>
           </motion.div>
         </motion.div>
 
-        {/* Notifications Area */}
-        <div className="h-20 max-w-md mx-auto mt-8">
+        {/* Toast Notifications */}
+        <div className="min-h-[56px] max-w-md mx-auto mt-5">
           <AnimatePresence mode="wait">
             {lastCreated && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                key="created"
+                initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="shadow-lg alert alert-success rounded-2xl"
+                className="flex items-center gap-3 px-4 py-3 border shadow-sm bg-success/10 border-success/25 rounded-2xl"
               >
-                <div className="flex-1">
-                  <span className="font-bold">Group Created!</span>
-                  <div className="mt-1 font-mono text-xs opacity-80">
+                <span className="text-lg">✅</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-base-content">
+                    Group Created!
+                  </p>
+                  <p className="font-mono text-xs text-base-content/60">
                     Code: {lastCreated.inviteCode}
-                  </div>
+                  </p>
                 </div>
                 <button
                   onClick={() => clearNotification("created")}
-                  className="btn btn-ghost btn-xs btn-circle"
+                  className="btn btn-ghost btn-xs btn-circle opacity-60 hover:opacity-100"
                 >
                   ✕
                 </button>
@@ -205,19 +277,21 @@ const Features = () => {
             )}
             {lastJoined && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                key="joined"
+                initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="shadow-lg alert alert-info rounded-2xl"
+                className="flex items-center gap-3 px-4 py-3 border shadow-sm bg-info/10 border-info/25 rounded-2xl"
               >
-                <div className="flex-1">
-                  <span className="font-bold">
-                    Joined Group: {lastJoined.name}
-                  </span>
+                <span className="text-lg">🎉</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-base-content">
+                    Joined: {lastJoined.name}
+                  </p>
                 </div>
                 <button
                   onClick={() => clearNotification("joined")}
-                  className="btn btn-ghost btn-xs btn-circle"
+                  className="btn btn-ghost btn-xs btn-circle opacity-60 hover:opacity-100"
                 >
                   ✕
                 </button>
@@ -227,16 +301,19 @@ const Features = () => {
         </div>
       </section>
 
-      {/* ── Feature Showcase Grid ── */}
-      <section className="px-6 py-24 bg-base-100">
+      {/* ══ Feature Showcase ══ */}
+      <section className="px-6 py-20 bg-base-200/40">
         <div className="container mx-auto">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-black md:text-5xl">
-              Powered for Professional Study
+          {/* Heading */}
+          <div className="mb-12 text-center">
+            <p className="text-[11px] font-bold tracking-[0.14em] uppercase text-primary mb-3">
+              Why StudySync
+            </p>
+            <h2 className="text-3xl font-black md:text-4xl text-base-content">
+              Built for Serious Students
             </h2>
-            <p className="max-w-md mx-auto text-base-content/60">
-              Premium tools designed to help you organize and excel in your
-              academic journey.
+            <p className="max-w-sm mx-auto mt-3 text-sm leading-relaxed text-base-content/50">
+              Premium tools that keep you organized, focused, and ahead.
             </p>
           </div>
 
@@ -245,25 +322,23 @@ const Features = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-4"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
           >
             {CORE_FEATURES.map((feature) => (
               <motion.div
                 key={feature.title}
                 variants={itemVariants}
-                whileHover={{ y: -5 }}
-                className={`card bg-base-100 border border-base-300 shadow-sm transition-all hover:shadow-md group`}
+                whileHover={{ y: -4 }}
+                className="flex flex-col gap-4 p-6 transition-all duration-300 border shadow-sm group rounded-2xl border-base-300 bg-base-100 hover:shadow-md hover:border-primary/20"
               >
-                <div className="p-8 card-body">
-                  <div
-                    className={`w-14 h-14 rounded-2xl bg-${feature.color}/10 flex items-center justify-center text-3xl mb-6 transition-transform group-hover:scale-110`}
-                  >
-                    {feature.icon}
-                  </div>
-                  <h3 className="mb-3 text-base font-bold card-title">
+                <div className="flex items-center justify-center w-12 h-12 text-2xl transition-transform duration-300 rounded-xl bg-base-200 group-hover:scale-110">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="mb-1 text-sm font-bold text-base-content">
                     {feature.title}
                   </h3>
-                  <p className="text-sm leading-relaxed text-base-content/60">
+                  <p className="text-xs leading-relaxed text-base-content/50">
                     {feature.desc}
                   </p>
                 </div>
@@ -273,28 +348,54 @@ const Features = () => {
         </div>
       </section>
 
-      {/* ── Process Timeline ── */}
-      <section className="container px-6 py-24 mx-auto text-center">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="mb-16 text-3xl font-black">
-            Three Simple Steps to Success
-          </h2>
-          <div className="relative grid grid-cols-1 gap-12 md:grid-cols-3">
-            <div className="hidden md:block absolute top-[28px] left-[15%] right-[15%] h-px bg-base-300 z-0" />
-            {WORKFLOW.map((item) => (
-              <div
-                key={item.step}
-                className="relative z-10 flex flex-col items-center"
-              >
-                <div className="flex items-center justify-center mb-6 text-xl font-black rounded-full shadow-lg w-14 h-14 bg-primary text-primary-content shadow-primary/20">
-                  {item.step}
-                </div>
-                <h3 className="mb-3 text-lg font-bold">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-base-content/50">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
+      {/* ══ Workflow Steps ══ */}
+      <section className="container px-6 py-20 mx-auto">
+        <div className="max-w-3xl mx-auto">
+          {/* Heading */}
+          <div className="text-center mb-14">
+            <p className="text-[11px] font-bold tracking-[0.14em] uppercase text-primary mb-3">
+              How it Works
+            </p>
+            <h2 className="text-3xl font-black text-base-content">
+              Three Steps to Collaboration
+            </h2>
+          </div>
+
+          {/* Steps */}
+          <div className="relative grid grid-cols-1 gap-10 md:grid-cols-3">
+            {/* Connector line */}
+            <div className="hidden md:block absolute top-[22px] left-[calc(16.5%+1px)] right-[calc(16.5%+1px)] h-px bg-gradient-to-r from-primary/30 via-secondary/30 to-accent/30 z-0" />
+
+            {WORKFLOW.map((item, idx) => {
+              const colors = [
+                "from-primary to-secondary",
+                "from-secondary to-accent",
+                "from-accent to-info",
+              ];
+              return (
+                <motion.div
+                  key={item.step}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.12 }}
+                  className="relative z-10 flex flex-col items-center text-center"
+                >
+                  {/* Step bubble */}
+                  <div
+                    className={`flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-br ${colors[idx]} text-white text-sm font-black shadow-lg mb-5`}
+                  >
+                    {item.step}
+                  </div>
+                  <h3 className="mb-2 text-sm font-bold text-base-content">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-base-content/50 leading-relaxed max-w-[170px]">
+                    {item.desc}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
