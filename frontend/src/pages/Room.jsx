@@ -203,7 +203,7 @@ const Room = () => {
             onClick={() => navigate("/dashboard")}
             className="btn btn-ghost btn-sm"
           >
-            ← Back
+            ← Exit
           </button>
           <div className="ml-4">
             <h1 className="text-xl font-bold">{groupData?.name}</h1>
@@ -271,9 +271,9 @@ const Room = () => {
                         className={`chat ${msg.sender._id === user?.id ? "chat-end" : "chat-start"}`}
                       >
                         <div className="text-xs opacity-50 chat-header">
-                          {typeof msg.sender.fullName === 'string' 
-                            ? msg.sender.fullName 
-                            : `${msg.sender.fullName?.firstName || ''} ${msg.sender.fullName?.lastName || ''}`.trim()}
+                          {typeof msg.sender.fullName === "string"
+                            ? msg.sender.fullName
+                            : `${msg.sender.fullName?.firstName || ""} ${msg.sender.fullName?.lastName || ""}`.trim()}
                         </div>
                         <div className="chat-bubble">{msg.text}</div>
                       </div>
