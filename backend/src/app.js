@@ -23,4 +23,13 @@ app.use("/api/group", groupRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/chat", chatRoutes);
 
+const path = require("path");
+
+// ✅ Serve frontend from public folder
+app.use(express.static(path.join(__dirname, "../public")));
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../public", "index.html"));
+});
+
 module.exports = app;
