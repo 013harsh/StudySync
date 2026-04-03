@@ -6,6 +6,8 @@ frontend/.env
 # backend
 backend/node_modules
 backend/.env
+backend/uploads/documents/*
+!backend/uploads/documents/.gitkeep
 
 # vscode
 .vscode

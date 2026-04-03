@@ -17,7 +17,21 @@ const messageSchema = new mongoose.Schema(
 
     text: {
       type: String,
-      required: true,
+      default: "",
+    },
+
+    messageType: {
+      type: String,
+      enum: ["text", "file"],
+      default: "text",
+    },
+
+    file: {
+      fileName: String,
+      fileUrl: String,
+      fileType: String,
+      fileSize: Number,
+      mimeType: String,
     },
 
     // aiStatus: {

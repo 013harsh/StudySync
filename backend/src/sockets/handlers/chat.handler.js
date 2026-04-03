@@ -5,7 +5,6 @@ const chatService = require("../../services/chat.service");
 
 module.exports = (io, socket) => {
   socket.on("join-chat", (groupId) => {
-    // This tells Socket.IO: "add this socket connection to this specific room"
     socket.join(groupId);
   });
 
@@ -13,31 +12,22 @@ module.exports = (io, socket) => {
     socket.leave(groupId);
   });
 
-  //  Send & Receive Message
   socket.on("send-message", async ({ groupId, message }) => {
     try {
-      // console.log("socket.user →", socket.user);
-      // 1. Auth check
       if (!socket.user) {
         return socket.emit("error", { message: "Unauthorized" });
       }
-
-      // 2. Input validation
       if (!groupId || !message || message.trim() === "") {
         return socket.emit("error", { message: "Invalid message data" });
       }
-
-      // 3. Validate ObjectId
       if (!mongoose.Types.ObjectId.isValid(groupId)) {
         return socket.emit("error", { message: "Invalid group ID" });
       }
 
-      // 4. Check user is a member of the group
       const group = await Group.findOne({
         _id: groupId,
         "members.user": socket.user.id,
       });
-
       if (!group) {
         return socket.emit("error", {
           message: "Not authorized to send message",
@@ -45,10 +35,9 @@ module.exports = (io, socket) => {
       }
 
       const cleanMessage = message.trim();
-
       let savedMessage = null;
 
-      // 5. Save to DB only for friend groups
+      //  Save to DB only for friend groups
       if (group.type === "friend") {
         savedMessage = await Message.create({
           groupId,
@@ -57,7 +46,7 @@ module.exports = (io, socket) => {
         });
       }
 
-      // 6. Broadcast to all group members in real-time
+      //  Broadcast to all group members in real-time
       io.to(groupId).emit("receive-message", {
         _id: savedMessage?._id || null,
         groupId,
@@ -69,7 +58,7 @@ module.exports = (io, socket) => {
         text: cleanMessage,
         groupType: group.type,
         createdAt: savedMessage?.createdAt || new Date(),
-      });
+      });      
     } catch (error) {
       console.error("Send message error:", error);
       socket.emit("error", { message: "Something went wrong" });

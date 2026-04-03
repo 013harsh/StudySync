@@ -3,7 +3,6 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth.routes");
 const groupRoutes = require("./routes/group.routes");
-const notesRoutes = require("./routes/notes.routes");
 const chatRoutes = require("./routes/chat.routes");
 const cors = require("cors");
 
@@ -20,13 +19,12 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/group", groupRoutes);
-app.use("/api/notes", notesRoutes);
 app.use("/api/chat", chatRoutes);
 
 const path = require("path");
 
-// ✅ Serve frontend from public folder
 app.use(express.static(path.join(__dirname, "../public")));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, "../public", "index.html"));

@@ -49,9 +49,20 @@ const getUnreadCount = async (groupId, userId) => {
   });
 };
 
+const saveFileMessage = async ({ groupId, senderId, fileData, text = "" }) => {
+  return await Message.create({
+    groupId,
+    sender: senderId,
+    text,
+    messageType: "file",
+    file: fileData,
+  });
+};
+
 module.exports = {
   getGroupMessages,
   saveMessage,
+  saveFileMessage,
   deleteMessageById,
   editMessageById,
   markMessagesAsRead,

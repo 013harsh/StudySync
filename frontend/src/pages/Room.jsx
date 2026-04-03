@@ -5,7 +5,7 @@ import MemberPanel from "../components/room/MemberPanel";
 import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
 import io from "socket.io-client";
-import { fetchMessage } from "../store/action/chat.action";
+import { fetchMessage, uploadFile } from "../store/action/chat.action";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -23,7 +23,6 @@ const Room = () => {
   const [error, setError] = useState(null);
   const [members, setMembers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [activeTab, setActiveTab] = useState("chat");
   const [timerSession, setTimerSession] = useState(null);
   const [newMessages, setNewMessages] = useState([]);
   const messages = [...reduxMessages, ...newMessages].filter(
@@ -31,6 +30,9 @@ const Room = () => {
   );
 
   const [chatInput, setChatInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const myMember = members.find(
     (m) => m.user?._id === user?.id || m.user?._id === user?._id,
@@ -162,6 +164,83 @@ const Room = () => {
 
     setChatInput("");
   };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) return;
+
+    setUploading(true);
+    try {
+      await uploadFile(groupId, selectedFile, chatInput);
+      setSelectedFile(null);
+      setChatInput("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Failed to upload file");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const cancelFileSelection = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
+
+  const getFileIcon = (file) => {
+    const type = file.type;
+    if (type.startsWith("image/")) return "🖼️";
+    if (type.includes("pdf")) return "📄";
+    if (type.includes("word") || type.includes("document")) return "📝";
+    if (type.includes("sheet") || type.includes("excel")) return "📊";
+    if (type.includes("presentation") || type.includes("powerpoint")) return "📽️";
+    if (type.includes("zip") || type.includes("rar") || type.includes("7z")) return "🗜️";
+    return "📎";
+  };
+
+  const renderFileMessage = (msg) => {
+    const fileIcon = msg.file?.fileType === "image" ? "🖼️" : 
+                     msg.file?.mimeType?.includes("pdf") ? "📄" :
+                     msg.file?.mimeType?.includes("word") ? "📝" :
+                     msg.file?.mimeType?.includes("sheet") ? "📊" : "📎";
+    
+    return (
+      <div className="chat-bubble">
+        <div className="flex items-start gap-2">
+          <span className="text-2xl">{fileIcon}</span>
+          <div className="flex-1 min-w-0">
+            <a 
+              href={`${API}${msg.file.fileUrl}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium hover:underline break-all"
+            >
+              {msg.file.fileName}
+            </a>
+            <p className="text-xs opacity-70">{formatFileSize(msg.file.fileSize)}</p>
+            {msg.text && <p className="mt-1">{msg.text}</p>}
+          </div>
+        </div>
+      </div>
+    );
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-base-200">
@@ -206,14 +285,14 @@ const Room = () => {
             ← Exit
           </button>
           <div className="ml-4">
-            <h1 className="text-xl font-bold">{groupData?.name}</h1>
+            <h1 className="text-lg font-bold">{groupData?.name}</h1>
             <p className="text-xs text-base-content/60">
               {groupData?.description || "No description"}
             </p>
           </div>
         </div>
         <div className="flex-none">
-          <span className="mr-4 badge badge-primary">
+          <span className="mr-4 badge badge-primary badge-sm">
             {isHost ? "🎯 Host View" : "🎓 Student View"}
           </span>
         </div>
@@ -237,81 +316,90 @@ const Room = () => {
           </div>
         </div>
 
-        {/* Right Panel - Chat & Notes */}
+        {/* Right Panel - Chat */}
         <div className="flex flex-col border-l w-96 bg-base-100 border-base-300">
-          {/* Tabs */}
-          <div className="border-b tabs tabs-boxed border-base-300">
-            <button
-              className={`tab flex-1 ${activeTab === "chat" ? "tab-active" : ""}`}
-              onClick={() => setActiveTab("chat")}
-            >
-              💬 Chat
-            </button>
-            <button
-              className={`tab flex-1 ${activeTab === "notes" ? "tab-active" : ""}`}
-              onClick={() => setActiveTab("notes")}
-            >
-              📝 Notes
-            </button>
-          </div>
-
-          {/* Tab Content */}
-          <div className="flex-1 overflow-hidden">
-            {activeTab === "chat" ? (
-              <div className="flex flex-col h-full">
-                <div className="flex-1 p-4 overflow-y-auto">
-                  {messages.length === 0 ? (
-                    <div className="text-center text-base-content/40">
-                      <p className="text-sm">Chat messages will appear here</p>
-                    </div>
-                  ) : (
-                    messages.map((msg) => (
-                      <div
-                        key={msg._id}
-                        className={`chat ${msg.sender._id === user?.id ? "chat-end" : "chat-start"}`}
-                      >
-                        <div className="text-xs opacity-50 chat-header">
-                          {typeof msg.sender.fullName === "string"
-                            ? msg.sender.fullName
-                            : `${msg.sender.fullName?.firstName || ""} ${msg.sender.fullName?.lastName || ""}`.trim()}
-                        </div>
-                        <div className="chat-bubble">{msg.text}</div>
-                      </div>
-                    ))
-                  )}
+          <div className="flex flex-col h-full">
+            <div className="flex-1 p-4 overflow-y-auto">
+              {messages.length === 0 ? (
+                <div className="text-center text-base-content/40">
+                  <p className="text-xs">Chat messages will appear here</p>
                 </div>
+              ) : (
+                messages.map((msg) => (
+                  <div
+                    key={msg._id}
+                    className={`chat ${msg.sender._id === user?.id ? "chat-end" : "chat-start"}`}
+                  >
+                    <div className="text-xs opacity-50 chat-header">
+                      {typeof msg.sender.fullName === "string"
+                        ? msg.sender.fullName
+                        : `${msg.sender.fullName?.firstName || ""} ${msg.sender.fullName?.lastName || ""}`.trim()}
+                    </div>
+                    {msg.messageType === "file" ? renderFileMessage(msg) : (
+                      <div className="chat-bubble text-sm">{msg.text}</div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
 
-                <div className="p-4 border-t border-base-300">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                      placeholder="Type a message..."
-                      className="flex-1 input input-bordered"
-                    />
-                    {/* <button className="btn btn-primary" >Send</button> */}
-                    <button onClick={sendMessage} className="btn btn-primary">
-                      Send
+            <div className="p-4 border-t border-base-300">
+              {selectedFile && (
+                <div className="mb-3 p-3 bg-base-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span className="text-2xl">{getFileIcon(selectedFile)}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{selectedFile.name}</p>
+                        <p className="text-xs opacity-60">{formatFileSize(selectedFile.size)}</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={cancelFileSelection}
+                      className="btn btn-ghost btn-sm btn-circle"
+                    >
+                      ✕
                     </button>
                   </div>
                 </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z,.jpg,.jpeg,.png,.gif,.webp"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="btn btn-ghost btn-square btn-sm"
+                  disabled={uploading}
+                >
+                  📎
+                </button>
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (selectedFile ? handleFileUpload() : sendMessage())}
+                  placeholder={selectedFile ? "Add a caption (optional)..." : "Type a message..."}
+                  className="flex-1 input input-bordered input-sm text-sm"
+                  disabled={uploading}
+                />
+                <button 
+                  onClick={selectedFile ? handleFileUpload : sendMessage} 
+                  className="btn btn-primary btn-sm"
+                  disabled={uploading || (!chatInput.trim() && !selectedFile)}
+                >
+                  {uploading ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    "Send"
+                  )}
+                </button>
               </div>
-            ) : (
-              <div className="flex flex-col h-full p-4">
-                <div className="flex-1 overflow-y-auto">
-                  <div className="text-center text-base-content/40">
-                    <p className="text-sm">Shared notes will appear here</p>
-                  </div>
-                </div>
-                <div className="pt-4 border-t border-base-300">
-                  <button className="w-full btn btn-primary btn-sm">
-                    + Add Note
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

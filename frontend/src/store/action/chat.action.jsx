@@ -27,5 +27,23 @@ export const removeMessage = (messageId) => async (dispatch) => {
   }
 };
 
-// export const UpdateMessage = (data) => async (dispatch) => {};
-// export const UpdateMessage = (data) => async (dispatch) => {};
+export const uploadFile = async (groupId, file, caption = "") => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (caption) {
+      formData.append("caption", caption);
+    }
+
+    const res = await axios.post(`/api/chat/groups/${groupId}/upload`, formData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("File upload error:", error);
+    throw error;
+  }
+};

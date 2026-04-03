@@ -148,4 +148,83 @@ const getUnreadCount = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-module.exports = { getMessages, deleteMessage, editMessage, getUnreadCount };
+const uploadFile = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const groupId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      return res.status(400).json({ message: "Invalid group ID" });
+    }
+
+    // Check user is a member
+    const group = await Group.findOne({ _id: groupId, "members.user": userId });
+    if (!group) {
+      return res.status(403).json({ message: "Not a member of this group" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const fileData = {
+      fileName: req.file.originalname,
+      fileUrl: `/uploads/documents/${req.file.filename}`,
+      fileType: req.file.mimetype.split("/")[0], // image, application, text
+      fileSize: req.file.size,
+      mimeType: req.file.mimetype,
+    };
+
+    // Save message with file
+    let savedMessage = null;
+    if (group.type === "friend") {
+      savedMessage = await chatService.saveFileMessage({
+        groupId,
+        senderId: userId,
+        fileData,
+        text: req.body.caption || "",
+      });
+
+      await savedMessage.populate("sender", "fullName email");
+    }
+
+    // Emit real-time event
+    getIO()
+      .to(groupId)
+      .emit("receive-message", {
+        _id: savedMessage?._id || null,
+        groupId,
+        sender: savedMessage
+          ? savedMessage.sender
+          : {
+              _id: userId,
+              fullName: req.user.fullName,
+              email: req.user.email,
+            },
+        text: req.body.caption || "",
+        messageType: "file",
+        file: fileData,
+        groupType: group.type,
+        createdAt: savedMessage?.createdAt || new Date(),
+      });
+
+    return res.status(200).json({
+      message: "File uploaded successfully",
+      data: savedMessage || { file: fileData },
+    });
+  } catch (error) {
+    console.error("Upload file error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+module.exports = {
+  getMessages,
+  deleteMessage,
+  editMessage,
+  getUnreadCount,
+  uploadFile,
+};

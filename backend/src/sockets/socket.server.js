@@ -2,7 +2,6 @@ const { Server } = require("socket.io");
 const { socketAuth } = require("../middleware/socket.middleware");
 const groupHandler = require("./handlers/group.handler");
 const chatHandler = require("./handlers/chat.handler");
-const noteHandler = require("./handlers/notes.handler");
 const webrtcHandler = require("./handlers/webrtc.handler");
 const studyRoomHandler = require("./handlers/studyRoom.handler");
 const { setIO } = require("./io");
@@ -26,7 +25,6 @@ function initSocketServer(httpserver) {
 
     groupHandler(io, socket);
     chatHandler(io, socket);
-    noteHandler(io, socket);
     webrtcHandler(io, socket);
     studyRoomHandler(io, socket);
 
