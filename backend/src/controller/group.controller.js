@@ -173,7 +173,9 @@ const leaveGroup = async (req, res) => {
     }
 
     // check user is a member
-    const member = group.members.find((m) => m.user.toString() === userId.toString());
+    const member = group.members.find(
+      (m) => m.user.toString() === userId.toString(),
+    );
     if (!member) {
       return res
         .status(403)
@@ -183,7 +185,9 @@ const leaveGroup = async (req, res) => {
     const isAdmin = member.role === "admin";
 
     // remove user from members
-    group.members = group.members.filter((m) => m.user.toString() !== userId.toString());
+    group.members = group.members.filter(
+      (m) => m.user.toString() !== userId.toString(),
+    );
 
     // if no members remain, delete the group entirely
     if (group.members.length === 0) {

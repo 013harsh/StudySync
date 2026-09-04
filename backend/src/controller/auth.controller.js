@@ -1,8 +1,9 @@
 require("dotenv").config();
 const userModel = require("../model/user.model");
+const groupModel = require("../model/group.model");
+const chatModel = require("../model/chat.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
 
 async function registerUser(req, res) {
   try {
@@ -49,7 +50,7 @@ async function registerUser(req, res) {
     res.cookie("token", token, cookieOptions);
 
     const userResponse = {
-      id: user._id,
+      _id: user._id,
       email: user.email,
       fullName: user.fullName,
       role: user.role,
@@ -104,7 +105,7 @@ async function loginUser(req, res) {
     });
 
     const userResponse = {
-      id: user._id,
+      _id: user._id,
       email: user.email,
       fullName: user.fullName,
       role: user.role,
@@ -168,7 +169,7 @@ async function updateProfile(req, res) {
     });
 
     const userResponse = {
-      id: user._id,
+      _id: user._id,
       email: user.email,
       fullName: user.fullName,
       role: user.role,
@@ -190,11 +191,32 @@ async function getMe(req, res) {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    return res.status(200).json({ user });
+    return res.status(200).json({ message: "User found", user });
   } catch (error) {
     console.error("GetMe Error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 }
+async function deleteUser(req, res) {
+  try {
+    const User = await userModel.deleteOne({ _id: req.params.id });
+    await groupModel.deleteMany({ createdBy: req.params.id });
+    await chatModel.deleteMany({ createdBy: req.params.id });
+    res.clearCookie("token");
+    return res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Delete User Error:", error);
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
 
-module.exports = { registerUser, loginUser, logout, updateProfile, getMe };
+module.exports = {
+  registerUser,
+  loginUser,
+  logout,
+  updateProfile,
+  getMe,
+  deleteUser,
+};
