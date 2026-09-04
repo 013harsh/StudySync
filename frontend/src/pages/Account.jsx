@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { userUpdate } from "../store/action/auth.action";
+import { userUpdate, deleteAccount } from "../store/action/auth.action";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -21,6 +21,20 @@ const Account = () => {
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleDelete = async () => {
+    try {
+      const userId = user?._id || user?.id;
+      if (!userId) {
+        return {
+          message: "User ID not found",
+        };
+      }
+      dispatch(deleteAccount(userId));
+      navigate("/login");
+    } catch (error) {
+      return error.response.data.message;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -259,7 +273,10 @@ const Account = () => {
                   Permanently delete your account and remove all associated
                   data. This action cannot be undone.
                 </p>
-                <button className="w-full btn btn-outline btn-error">
+                <button
+                  className="w-full btn btn-outline btn-error"
+                  onClick={handleDelete}
+                >
                   Delete Account
                 </button>
               </div>

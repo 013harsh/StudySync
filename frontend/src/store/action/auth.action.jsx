@@ -65,3 +65,15 @@ export const userUpdate = (data) => async (dispatch) => {
     console.log("error", error);
   }
 };
+export const deleteAccount = (id) => async (dispatch) => {
+  try {
+    await axios.delete(`/api/auth/delete/${id}`, {
+      withCredentials: true,
+    });
+    dispatch(deleteuserAccount());
+    return { success: true };
+  } catch (error) {
+    console.log("error", error);
+    return { success: false, error: error.response?.data?.message };
+  }
+};

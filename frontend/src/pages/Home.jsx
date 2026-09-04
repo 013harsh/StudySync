@@ -81,9 +81,9 @@ const Home = () => {
     <div className="flex flex-col overflow-x-hidden">
       <section className="relative flex items-center min-h-screen overflow-hidden bg-gradient-to-br from-base-100 via-base-200 to-base-100">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-40 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 right-10 w-64 h-64 bg-accent/5 rounded-full blur-2xl" />
+          <div className="absolute rounded-full top-20 right-20 w-96 h-96 bg-primary/5 blur-3xl" />
+          <div className="absolute rounded-full bottom-20 right-40 w-80 h-80 bg-secondary/5 blur-3xl" />
+          <div className="absolute w-64 h-64 rounded-full top-1/2 right-10 bg-accent/5 blur-2xl" />
         </div>
 
         <div className="container relative z-10 px-6 py-20 mx-auto lg:px-12">
@@ -125,8 +125,8 @@ const Home = () => {
               {/* CTA Buttons */}
               <div className="flex flex-col gap-4 mb-10 sm:flex-row">
                 <Link
-                  to="/dashboard"
-                  className="shadow-lg btn btn-primary btn-lg hover:scale-105 transition-transform"
+                  to="/features"
+                  className="transition-transform shadow-lg btn btn-primary btn-lg hover:scale-105"
                 >
                   Get Started
                   <svg
@@ -142,12 +142,6 @@ const Home = () => {
                       d="M13 7l5 5m0 0l-5 5m5-5H6"
                     />
                   </svg>
-                </Link>
-                <Link
-                  to="/features"
-                  className="btn btn-outline btn-lg hover:scale-105 transition-transform"
-                >
-                  Explore Features
                 </Link>
               </div>
             </div>
@@ -179,7 +173,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
         <div className="absolute flex flex-col items-center gap-2 -translate-x-1/2 bottom-8 left-1/2 text-base-content/40 animate-bounce">
           <span className="text-xs tracking-widest uppercase">Scroll</span>
           <svg

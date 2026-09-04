@@ -210,31 +210,41 @@ const Room = () => {
     if (type.includes("pdf")) return "📄";
     if (type.includes("word") || type.includes("document")) return "📝";
     if (type.includes("sheet") || type.includes("excel")) return "📊";
-    if (type.includes("presentation") || type.includes("powerpoint")) return "📽️";
-    if (type.includes("zip") || type.includes("rar") || type.includes("7z")) return "🗜️";
+    if (type.includes("presentation") || type.includes("powerpoint"))
+      return "📽️";
+    if (type.includes("zip") || type.includes("rar") || type.includes("7z"))
+      return "🗜️";
     return "📎";
   };
 
   const renderFileMessage = (msg) => {
-    const fileIcon = msg.file?.fileType === "image" ? "🖼️" : 
-                     msg.file?.mimeType?.includes("pdf") ? "📄" :
-                     msg.file?.mimeType?.includes("word") ? "📝" :
-                     msg.file?.mimeType?.includes("sheet") ? "📊" : "📎";
-    
+    const fileIcon =
+      msg.file?.fileType === "image"
+        ? "🖼️"
+        : msg.file?.mimeType?.includes("pdf")
+          ? "📄"
+          : msg.file?.mimeType?.includes("word")
+            ? "📝"
+            : msg.file?.mimeType?.includes("sheet")
+              ? "📊"
+              : "📎";
+
     return (
       <div className="chat-bubble">
         <div className="flex items-start gap-2">
           <span className="text-2xl">{fileIcon}</span>
           <div className="flex-1 min-w-0">
-            <a 
+            <a
               href={`${API}${msg.file.fileUrl}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium hover:underline break-all"
+              className="font-medium break-all hover:underline"
             >
               {msg.file.fileName}
             </a>
-            <p className="text-xs opacity-70">{formatFileSize(msg.file.fileSize)}</p>
+            <p className="text-xs opacity-70">
+              {formatFileSize(msg.file.fileSize)}
+            </p>
             {msg.text && <p className="mt-1">{msg.text}</p>}
           </div>
         </div>
@@ -335,8 +345,10 @@ const Room = () => {
                         ? msg.sender.fullName
                         : `${msg.sender.fullName?.firstName || ""} ${msg.sender.fullName?.lastName || ""}`.trim()}
                     </div>
-                    {msg.messageType === "file" ? renderFileMessage(msg) : (
-                      <div className="chat-bubble text-sm">{msg.text}</div>
+                    {msg.messageType === "file" ? (
+                      renderFileMessage(msg)
+                    ) : (
+                      <div className="text-sm chat-bubble">{msg.text}</div>
                     )}
                   </div>
                 ))
@@ -345,16 +357,22 @@ const Room = () => {
 
             <div className="p-4 border-t border-base-300">
               {selectedFile && (
-                <div className="mb-3 p-3 bg-base-200 rounded-lg">
+                <div className="p-3 mb-3 rounded-lg bg-base-200">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span className="text-2xl">{getFileIcon(selectedFile)}</span>
+                    <div className="flex items-center flex-1 min-w-0 gap-2">
+                      <span className="text-2xl">
+                        {getFileIcon(selectedFile)}
+                      </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{selectedFile.name}</p>
-                        <p className="text-xs opacity-60">{formatFileSize(selectedFile.size)}</p>
+                        <p className="text-sm font-medium truncate">
+                          {selectedFile.name}
+                        </p>
+                        <p className="text-xs opacity-60">
+                          {formatFileSize(selectedFile.size)}
+                        </p>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={cancelFileSelection}
                       className="btn btn-ghost btn-sm btn-circle"
                     >
@@ -382,13 +400,20 @@ const Room = () => {
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && (selectedFile ? handleFileUpload() : sendMessage())}
-                  placeholder={selectedFile ? "Add a caption (optional)..." : "Type a message..."}
-                  className="flex-1 input input-bordered input-sm text-sm"
+                  onKeyDown={(e) =>
+                    e.key === "Enter" &&
+                    (selectedFile ? handleFileUpload() : sendMessage())
+                  }
+                  placeholder={
+                    selectedFile
+                      ? "Add a caption (optional)..."
+                      : "Type a message..."
+                  }
+                  className="flex-1 text-sm input input-bordered input-sm"
                   disabled={uploading}
                 />
-                <button 
-                  onClick={selectedFile ? handleFileUpload : sendMessage} 
+                <button
+                  onClick={selectedFile ? handleFileUpload : sendMessage}
                   className="btn btn-primary btn-sm"
                   disabled={uploading || (!chatInput.trim() && !selectedFile)}
                 >

@@ -34,7 +34,16 @@ const NavBar = () => {
         </button>
       </div>
 
-      <div className="flex items-center flex-none gap-6 ml-4">
+      <div className="flex items-center flex-none gap-6 ml-4 ">
+        <div className="flex-1 bg">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="text-lg font-bold normal-case text-primary"
+          >
+            Dashboard
+          </button>
+        </div>
+
         <div className="flex items-center gap-2 mr-4">
           <button
             onClick={toggleTheme}
@@ -43,7 +52,7 @@ const NavBar = () => {
           >
             {theme === "winter" ? (
               <svg
-                className="swap-on h-7 w-7 fill-current"
+                className="fill-current swap-on h-7 w-7"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
               >
@@ -51,7 +60,7 @@ const NavBar = () => {
               </svg>
             ) : (
               <svg
-                className="swap-off h-7 w-7 fill-current"
+                className="fill-current swap-off h-7 w-7"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
               >

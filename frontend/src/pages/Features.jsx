@@ -68,9 +68,8 @@ const WORKFLOW = [
 ];
 
 const HeroSection = () => (
-  <section className="relative pt-0 pb-4 overflow-hidden sm:pt-28 bg-base-100">
+  <section className="relative pt-6 overflow-hidden sm:pt-15 bg-base-100">
     <div className="container relative z-10 px-6 mx-auto text-center">
-      {/* Badge */}
       <motion.div
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -86,26 +85,9 @@ const HeroSection = () => (
         initial={{ y: 22, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="text-4xl font-black leading-[1.1] tracking-tight md:text-6xl lg:text-7xl text-base-content "
+        className="text-3xl font-black leading-[1.1] tracking-tight md:text-6xl lg:text-5xl text-base-content "
       >
-        Your Study Network <br />
-        <span className="relative inline-block text-primary">
-          Simplified
-          <svg
-            className="absolute left-0 w-full -bottom-2"
-            viewBox="0 0 200 12"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0 8 Q50 0 100 8 T200 8"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              opacity="0.35"
-            />
-          </svg>
-        </span>
+        Your Study Network Simplified
       </motion.h1>
 
       {/* Subtext */}
@@ -113,7 +95,7 @@ const HeroSection = () => (
         initial={{ y: 22, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.25 }}
-        className="max-w-xl mx-auto mt-6 text-base leading-relaxed md:text-lg text-base-content/55"
+        className="max-w-xl mx-auto mt-6 text-base leading-relaxed md:text-lg text-base-content/85"
       >
         The premium hub for modern students — create focused study groups,
         collaborate on shared notes, and stay in sync with your academic goals.

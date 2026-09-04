@@ -25,7 +25,7 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate("/dashboard");
+      navigate("/home");
     } else {
       setError(result.error);
     }
@@ -43,10 +43,10 @@ const Login = () => {
           </div>
 
           {error && (
-            <div className="alert alert-error mb-4 rounded-box p-3 shadow-sm">
+            <div className="p-3 mb-4 shadow-sm alert alert-error rounded-box">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
+                className="w-6 h-6 stroke-current shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
               >
