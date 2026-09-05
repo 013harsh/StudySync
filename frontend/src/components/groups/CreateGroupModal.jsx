@@ -3,19 +3,15 @@ import { useDispatch } from "react-redux";
 import { createGroup } from "../../store/action/group.action";
 import { useNavigate } from "react-router-dom";
 
-
-const API = "http://localhost:3000";
-
 const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
   const dialogRef = useRef(null);
-  
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("study");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const reset = () => {
     setName("");
@@ -32,6 +28,7 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
   };
   const close = () => dialogRef.current?.close();
   const dispatch = useDispatch();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -45,12 +42,12 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
       );
 
       setSuccess(`Group created successfully!`);
-      onSuccess?.(); 
+      onSuccess?.();
       setTimeout(() => {
         close();
         reset();
         navigate(`/room/${group._id}`);
-      }, 1000); // Shorter timeout for faster perceived performance
+      }, 100);
     } catch (err) {
       setError(err.message || "Failed to create group");
     } finally {
@@ -62,7 +59,7 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
     <>
       <button
         onClick={open}
-        className="btn btn-primary rounded-xl font-bold w-full text-sm h-10 min-h-0"
+        className="w-full h-10 min-h-0 text-sm font-bold btn btn-primary rounded-xl"
       >
         + Create Group
       </button>
@@ -72,45 +69,42 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
         id={modalId}
         className="modal modal-bottom sm:modal-middle"
       >
-        <div className="modal-box rounded-2xl p-0 overflow-hidden max-w-md w-full">
-          {/* Header */}
+        <div className="w-full max-w-md p-0 overflow-hidden modal-box rounded-2xl">
           <div className="px-6 pt-6 pb-4 bg-primary text-primary-content">
             <h3 className="text-2xl font-black">Create a Group</h3>
-            <p className="text-primary-content/70 text-sm mt-1">
+            <p className="mt-1 text-sm text-primary-content/70">
               Start collaborating with your classmates.
             </p>
           </div>
 
-          {/* Body */}
           <form
             onSubmit={handleSubmit}
-            className="px-6 py-5 bg-base-100 flex flex-col gap-4"
+            className="flex flex-col gap-4 px-6 py-5 bg-base-100"
           >
             {success && (
               <div className="alert alert-success rounded-xl">
                 <span className="text-xl">✅</span>
-                <p className="font-semibold text-sm">{success}</p>
+                <p className="text-sm font-semibold">{success}</p>
               </div>
             )}
 
             {error && (
               <div className="alert alert-error rounded-xl">
                 <span className="text-xl">❌</span>
-                <p className="font-semibold text-sm">{error}</p>
+                <p className="text-sm font-semibold">{error}</p>
               </div>
             )}
 
-            {/* Group Name */}
-            <div className="form-control gap-1">
-              <label className="label py-0">
-                <span className="label-text font-bold text-base">
+            <div className="gap-1 form-control">
+              <label className="py-0 label">
+                <span className="text-base font-bold label-text">
                   Group Name <span className="text-error">*</span>
                 </span>
               </label>
               <input
                 type="text"
                 placeholder="e.g. Physics Batch 2025"
-                className="input input-bordered input-primary w-full"
+                className="w-full input input-bordered input-primary"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={60}
@@ -118,34 +112,32 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
               />
             </div>
 
-            {/* Description */}
-            <div className="form-control gap-1">
-              <label className="label py-0">
-                <span className="label-text font-bold text-base">
+            <div className="gap-1 form-control">
+              <label className="py-0 label">
+                <span className="text-base font-bold label-text">
                   Description{" "}
-                  <span className="text-base-content/40 font-normal">
+                  <span className="font-normal text-base-content/40">
                     (optional)
                   </span>
                 </span>
               </label>
               <textarea
                 placeholder="What is this group about?"
-                className="textarea textarea-bordered textarea-primary w-full resize-none"
+                className="w-full resize-none textarea textarea-bordered textarea-primary"
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={200}
                 disabled={loading}
               />
-              <span className="text-xs text-base-content/40 text-right">
+              <span className="text-xs text-right text-base-content/40">
                 {description.length}/200
               </span>
             </div>
 
-            {/* Group Type */}
-            <div className="form-control gap-2">
-              <label className="label py-0">
-                <span className="label-text font-bold text-base">
+            <div className="gap-2 form-control">
+              <label className="py-0 label">
+                <span className="text-base font-bold label-text">
                   Group Type
                 </span>
               </label>
@@ -179,7 +171,7 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
                       className="hidden"
                       disabled={loading}
                     />
-                    <span className="font-bold text-sm text-base-content">
+                    <span className="text-sm font-bold text-base-content">
                       {opt.label}
                     </span>
                     <span className="text-xs text-base-content/50">
@@ -190,19 +182,18 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="modal-action mt-2 flex gap-3">
+            <div className="flex gap-3 mt-2 modal-action">
               <button
                 type="button"
                 onClick={close}
-                className="btn btn-ghost flex-1 rounded-xl"
+                className="flex-1 btn btn-ghost rounded-xl"
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="btn btn-primary flex-1 rounded-xl font-bold"
+                className="flex-1 font-bold btn btn-primary rounded-xl"
                 disabled={loading}
               >
                 {loading ? (

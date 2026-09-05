@@ -1,10 +1,10 @@
 import axios from "axios";
-import { loginSuccess, logout, Register } from "../reducer/auth.slice";
+import { loginSuccess, logout, Register, deleteuserAccount } from "../reducer/auth.slice";
 
 // const dispatch = useDispatch();
 export const userRegister = (data) => async (dispatch) => {
   try {
-    const res = await axios.post("/api/auth/register", data, {
+    const res = await axios.post("/api/auth/userRegister", data, {
       withCredentials: true,
     });
     console.log(res.data.user);
@@ -18,7 +18,7 @@ export const userRegister = (data) => async (dispatch) => {
 };
 export const userLogin = (data) => async (dispatch) => {
   try {
-    const res = await axios.post("/api/auth/login", data, {
+    const res = await axios.post("/api/auth/userLogin", data, {
       withCredentials: true,
     });
     console.log(res.data.user);
@@ -32,42 +32,44 @@ export const userLogin = (data) => async (dispatch) => {
 };
 export const userLogout = (data) => async (dispatch) => {
   try {
-    await axios.post("/api/auth/logout", data, {
+    await axios.post("/api/auth/userLogout", data, {
       withCredentials: true,
     });
     dispatch(logout());
   } catch (error) {
-    console.log("error", error);
+    console.log("error", error.data.message);
   }
 };
-export const usercurrent = () => async (dispatch) => {
+
+export const userdetails = () => async (dispatch) => {
   try {
-    const res = await axios.get("/api/auth/me", {
+    const res = await axios.get("/api/auth/userDetails", {
       withCredentials: true,
     });
 
-    dispatch(loginSuccess(res.data.user));
-    return { success: true, user: res.data.user };
+    dispatch(loginSuccess(res.data.userdetails));
+    return { success: true, userdetails: res.data.userdetails };
   } catch (error) {
     console.log("error", error);
     dispatch(logout());
-    return { success: false };
+    return { success: false, error: error.data.message };
   }
 };
+
 export const userUpdate = (data) => async (dispatch) => {
   try {
-    const res = await axios.put("/api/auth/profile", data, {
+    const res = await axios.put("/api/auth/userUpdateProfile", data, {
       withCredentials: true,
     });
 
     dispatch(loginSuccess(res.data.user));
   } catch (error) {
-    console.log("error", error);
+    console.log("error", error.data.message);
   }
 };
 export const deleteAccount = (id) => async (dispatch) => {
   try {
-    await axios.delete(`/api/auth/delete/${id}`, {
+    await axios.delete(`/api/auth/deleteAccount/${id}`, {
       withCredentials: true,
     });
     dispatch(deleteuserAccount());

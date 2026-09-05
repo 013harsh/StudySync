@@ -5,7 +5,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { useTheme } from "./context/ThemeContext";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { usercurrent } from "./store/action/auth.action";
+import { userdetails } from "./store/action/auth.action";
 import { useLocation } from "react-router-dom";
 
 export const App = () => {
@@ -17,9 +17,9 @@ export const App = () => {
   const hideFooter = location.pathname.startsWith("/room");
 
   useEffect(() => {
-    dispatch(usercurrent());
+    dispatch(userdetails());
   }, []);
-  
+
   return (
     <ErrorBoundary>
       <div

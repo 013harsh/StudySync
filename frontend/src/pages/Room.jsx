@@ -6,6 +6,7 @@ import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
 import io from "socket.io-client";
 import { fetchMessage, uploadFile } from "../store/action/chat.action";
+import { getGroupMembers } from "../store/action/group.action";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -43,11 +44,7 @@ const Room = () => {
   useEffect(() => {
     const fetchGroup = async () => {
       try {
-        const res = await fetch(`${API}/api/group/${groupId}/members`, {
-          credentials: "include",
-        });
-
-        const data = await res.json();
+        const data = await dispatch(getGroupMembers(groupId));
 
         setGroupData({
           _id: data.groupId,
@@ -70,12 +67,10 @@ const Room = () => {
     fetchGroup();
   }, [groupId, dispatch]);
 
-  //not resetting on group change
   useEffect(() => {
     setNewMessages([]);
   }, [groupId]);
 
-  //socket connection
   useEffect(() => {
     if (!user || !groupId) return;
 
@@ -147,6 +142,14 @@ const Room = () => {
 
     socket.on("receive-message", (data) => {
       setNewMessages((prev) => [...prev, data]);
+    });
+
+    socket.on("group:deleted", (data) => {
+      console.log("Group deleted:", data);
+      if (data.groupId === groupId) {
+        alert("This group has been deleted by an admin.");
+        navigate("/dashboard");
+      }
     });
 
     return () => {

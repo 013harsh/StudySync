@@ -23,7 +23,7 @@ const Account = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   const handleDelete = async () => {
     try {
-      const userId = user?._id || user?.id;
+      const userId = user?._id;
       if (!userId) {
         return {
           message: "User ID not found",

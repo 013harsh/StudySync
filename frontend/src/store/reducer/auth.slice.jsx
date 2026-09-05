@@ -29,14 +29,14 @@ const authSlice = createSlice({
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
-    deleteuserAccount: (state, action) => {
-      state.user = action.payload;
+    deleteuserAccount: (state) => {
+      state.user = null;
       state.isAuthenticated = false;
       state.loading = false;
     },
   },
 });
 
-export const { loginSuccess, logout, Register, setLoading, deleteAccount } =
+export const { loginSuccess, logout, Register, setLoading, deleteuserAccount } =
   authSlice.actions;
 export default authSlice.reducer;

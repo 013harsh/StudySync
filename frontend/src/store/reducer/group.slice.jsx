@@ -23,8 +23,12 @@ const groupSlice = createSlice({
     setGroups: (state, action) => {
       state.group = action.payload;
     },
+    setMembers: (state, action) => {
+      state.member = action.payload;
+    },
   },
 });
 
-export const { addGroup, deleteg, setGroup, setGroups } = groupSlice.actions;
+export const { addGroup, deleteg, setGroup, setGroups, setMembers } =
+  groupSlice.actions;
 export default groupSlice.reducer;

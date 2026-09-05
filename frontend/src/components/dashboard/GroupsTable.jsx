@@ -1,5 +1,6 @@
-/* GroupsTable — DaisyUI semantic tokens only */
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteGroup } from "../../store/action/group.action";
 
 function TypeBadge({ type }) {
   return type === "study" ? (
@@ -26,15 +27,20 @@ function formatDate(iso) {
     year: "numeric",
   });
 }
-
 const GroupsTable = ({ groups, loading, error }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+
+  const handleDelete = async (e, groupId) => {
+    e.stopPropagation();
+    dispatch(deleteGroup(groupId));
+  };
 
   const handleRowClick = (groupId) => {
     navigate(`/room/${groupId}`);
   };
 
-  /* Loading */
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-20">
@@ -44,7 +50,6 @@ const GroupsTable = ({ groups, loading, error }) => {
     );
   }
 
-  /* Error */
   if (error) {
     return (
       <div className="flex items-start gap-3 alert alert-error rounded-xl">
@@ -57,7 +62,6 @@ const GroupsTable = ({ groups, loading, error }) => {
     );
   }
 
-  /* Empty */
   if (groups.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
@@ -70,7 +74,6 @@ const GroupsTable = ({ groups, loading, error }) => {
     );
   }
 
-  /* Table */
   return (
     <div className="overflow-x-auto border rounded-xl border-base-300">
       <table className="table w-full text-base table-zebra">
@@ -81,6 +84,7 @@ const GroupsTable = ({ groups, loading, error }) => {
             <th className="font-bold">Role</th>
             <th className="font-bold">Members</th>
             <th className="hidden font-bold sm:table-cell">Created</th>
+            <th className="font-bold">Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -112,6 +116,16 @@ const GroupsTable = ({ groups, loading, error }) => {
               </td>
               <td className="hidden text-sm sm:table-cell text-base-content/40">
                 {formatDate(g.createdAt)}
+              </td>
+              <td className="flex items-center gap-2">
+                {g.myRole === "admin" && (
+                  <button
+                    onClick={(e) => handleDelete(e, g._id)}
+                    className="btn btn-error btn-sm"
+                  >
+                    Delete
+                  </button>
+                )}
               </td>
             </tr>
           ))}
