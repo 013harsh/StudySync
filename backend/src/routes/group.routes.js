@@ -12,8 +12,8 @@ const { authMiddleware } = require("../middleware/auth.middleware");
 router.post("/create", authMiddleware, createGroup);
 router.post("/join", authMiddleware, joinGroup);
 router.get("/my-groups", authMiddleware, getMyGroups);
-router.delete("/delete/:id", authMiddleware, deleteGroup);
+router.get("/groupmember/:id", authMiddleware, getGroupMembers);
+router.delete("/deletegroup/:id", authMiddleware, deleteGroup);
 router.put("/leave/:id", authMiddleware, leaveGroup);
-router.get("/:id/members", authMiddleware, getGroupMembers);
 
 module.exports = router;

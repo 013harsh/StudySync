@@ -124,7 +124,7 @@ async function logout(req, res) {
     return res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     console.error("Logout Error:", error);
-    return res.status(500).json({ message: "something went wrong" });
+    return res.status(500).json({ message: error.message });
   }
 }
 async function updateProfile(req, res) {
@@ -185,18 +185,20 @@ async function updateProfile(req, res) {
       .json({ message: "Something went wrong updating profile" });
   }
 }
-async function getMe(req, res) {
+
+async function userdetails(req, res) {
   try {
     const user = await userModel.findById(req.user.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    return res.status(200).json({ message: "User found", user });
+    return res.status(200).json({ userdetails: user });
   } catch (error) {
     console.error("GetMe Error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: user.message });
   }
 }
+
 async function deleteUser(req, res) {
   try {
     const User = await userModel.deleteOne({ _id: req.params.id });
@@ -217,6 +219,6 @@ module.exports = {
   loginUser,
   logout,
   updateProfile,
-  getMe,
+  userdetails,
   deleteUser,
 };
