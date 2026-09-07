@@ -3,6 +3,16 @@ const sessions = new Map();
 module.exports = (io, socket) => {
   const userId = socket.user?.id?.toString();
 
+  socket.on("join-group", (groupId) => {
+    const session = sessions.get(groupId);
+    if (session) {
+      socket.emit("room:session-started", {
+        groupId,
+        session,
+      });
+    }
+  });
+
   socket.on("room:start-session", ({ groupId, mode, duration }) => {
     try {
       if (!userId || !groupId) {

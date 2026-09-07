@@ -8,7 +8,8 @@ const getGroupMessages = async (groupId, { before, limit = 20 }) => {
   }
 
   const messages = await Message.find(query)
-    .populate("sender", "fullName email")
+    .populate("sender", "fullName ")
+    .select("-__v -readBy ")
     .sort({ _id: -1 }) // newest first
     .limit(limit);
 

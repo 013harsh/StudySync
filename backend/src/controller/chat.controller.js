@@ -33,16 +33,15 @@ const getMessages = async (req, res) => {
       before: before || null,
       limit: parseInt(limit) || 20,
     });
-
     // Mark messages as read
     await chatService.markMessagesAsRead(groupId, userId);
 
     return res.status(200).json({ messages });
   } catch (error) {
-    console.error("Get messages error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: error.message });
   }
 };
+
 const deleteMessage = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -61,10 +60,10 @@ const deleteMessage = async (req, res) => {
     }
 
     // Only sender can delete
-    if (message.sender.toString() !== userId) {
+    if (message.sender.toString() !== userId.toString()) {
       return res
         .status(403)
-        .json({ message: "Unauthorized — not your message" });
+        .json({ message: "Unauthorized - not your message" });
     }
 
     await chatService.deleteMessageById(messageId);
@@ -78,9 +77,10 @@ const deleteMessage = async (req, res) => {
     return res.status(200).json({ message: "Message deleted successfully" });
   } catch (error) {
     console.error("Delete message error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: error.message });
   }
 };
+
 const editMessage = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -104,10 +104,10 @@ const editMessage = async (req, res) => {
     }
 
     // Only sender can edit
-    if (message.sender.toString() !== userId) {
+    if (message.sender.toString() !== userId.toString()) {
       return res
         .status(403)
-        .json({ message: "Unauthorized — not your message" });
+        .json({ message: "Unauthorized - not your message" });
     }
 
     const updated = await chatService.editMessageById(messageId, text.trim());
@@ -129,6 +129,7 @@ const editMessage = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 const getUnreadCount = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -148,6 +149,7 @@ const getUnreadCount = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 const uploadFile = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -216,8 +218,8 @@ const uploadFile = async (req, res) => {
       data: savedMessage || { file: fileData },
     });
   } catch (error) {
-    console.error("Upload file error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    console.error("Upload file error:", error.message);
+    return res.status(500).json({ message: error.message });
   }
 };
 

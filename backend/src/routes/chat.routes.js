@@ -9,15 +9,15 @@ const {
 const { authMiddleware } = require("../middleware/auth.middleware");
 const upload = require("../middleware/upload.middleware");
 
-router.get("/groups/:id/messages", authMiddleware, getMessages);
-router.get("/groups/:id/unread", authMiddleware, getUnreadCount);
+router.get("/group/:id/group-messages", authMiddleware, getMessages);
 router.post(
-  "/groups/:id/upload",
+  "/group/:id/upload",
   authMiddleware,
   upload.single("file"),
   uploadFile,
 );
 router.delete("/messages/:id", authMiddleware, deleteMessage);
 router.put("/messages/:id", authMiddleware, editMessage);
+router.get("/group/:id/unread", authMiddleware, getUnreadCount);
 
 module.exports = router;
