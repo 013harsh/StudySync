@@ -1,13 +1,10 @@
 import axios from "axios";
 
-import {
-  getMessages,
-  deleteMessage,
-} from "../reducer/chat.slice";
+import { getMessages, deleteMessage } from "../reducer/chat.slice";
 
 export const fetchMessage = (groupId) => async (dispatch) => {
   try {
-    const res = await axios.get(`/api/chat/groups/${groupId}/messages`, {
+    const res = await axios.get(`/api/chat/group/${groupId}/group-messages`, {
       withCredentials: true,
     });
     dispatch(getMessages(res.data.messages));
@@ -18,7 +15,7 @@ export const fetchMessage = (groupId) => async (dispatch) => {
 
 export const removeMessage = (messageId) => async (dispatch) => {
   try {
-    await axios.delete(`/api/chat/message/${messageId}`, {
+    await axios.delete(`/api/chat/messages/${messageId}`, {
       withCredentials: true,
     });
     dispatch(deleteMessage(messageId));
@@ -35,12 +32,16 @@ export const uploadFile = async (groupId, file, caption = "") => {
       formData.append("caption", caption);
     }
 
-    const res = await axios.post(`/api/chat/groups/${groupId}/upload`, formData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const res = await axios.post(
+      `/api/chat/group/${groupId}/upload`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    });
+    );
     return res.data;
   } catch (error) {
     console.error("File upload error:", error);

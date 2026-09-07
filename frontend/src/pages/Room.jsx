@@ -5,7 +5,7 @@ import MemberPanel from "../components/room/MemberPanel";
 import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
 import io from "socket.io-client";
-import { fetchMessage, uploadFile } from "../store/action/chat.action";
+import { fetchMessage, uploadFile, removeMessage } from "../store/action/chat.action";
 import { getGroupMembers } from "../store/action/group.action";
 
 const API = import.meta.env.VITE_API_URL;
@@ -158,6 +158,13 @@ const Room = () => {
     };
   }, [groupId, user]);
 
+  const handleDelete = (messageId) => {
+    if (window.confirm("Are you sure you want to delete this message?")) {
+      dispatch(removeMessage(messageId));
+      setNewMessages((prev) => prev.filter((m) => m._id !== messageId));
+    }
+  };
+
   const sendMessage = () => {
     if (!chatInput.trim()) return;
     socketRef.current.emit("send-message", {
@@ -220,6 +227,39 @@ const Room = () => {
     return "📎";
   };
 
+  const isOwnMessage = (msg) => {
+    const senderId = msg.sender?._id || msg.sender;
+    const currentUserId = user?._id || user?.id;
+    return String(senderId) === String(currentUserId);
+  };
+
+  const renderDropdown = (msg) => {
+    if (!isOwnMessage(msg)) return null;
+    return (
+      <div className="absolute top-1 right-1 dropdown dropdown-end opacity-0 group-hover:opacity-100 transition-opacity">
+        <div
+          tabIndex={0}
+          role="button"
+          className="btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-0 p-0 text-base-content"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <ul
+          tabIndex={0}
+          className="dropdown-content z-[10] menu p-1 shadow bg-base-100 rounded-box w-24 text-xs"
+        >
+          <li>
+            <a className="text-error" onClick={() => handleDelete(msg._id)}>
+              Delete
+            </a>
+          </li>
+        </ul>
+      </div>
+    );
+  };
+
   const renderFileMessage = (msg) => {
     const fileIcon =
       msg.file?.fileType === "image"
@@ -233,7 +273,7 @@ const Room = () => {
               : "📎";
 
     return (
-      <div className="chat-bubble">
+      <div className="relative group chat-bubble pr-8">
         <div className="flex items-start gap-2">
           <span className="text-2xl">{fileIcon}</span>
           <div className="flex-1 min-w-0">
@@ -251,6 +291,7 @@ const Room = () => {
             {msg.text && <p className="mt-1">{msg.text}</p>}
           </div>
         </div>
+        {renderDropdown(msg)}
       </div>
     );
   };
@@ -341,7 +382,7 @@ const Room = () => {
                 messages.map((msg) => (
                   <div
                     key={msg._id}
-                    className={`chat ${msg.sender._id === user?.id ? "chat-end" : "chat-start"}`}
+                    className={`chat ${isOwnMessage(msg) ? "chat-end" : "chat-start"}`}
                   >
                     <div className="text-xs opacity-50 chat-header">
                       {typeof msg.sender.fullName === "string"
@@ -351,7 +392,10 @@ const Room = () => {
                     {msg.messageType === "file" ? (
                       renderFileMessage(msg)
                     ) : (
-                      <div className="text-sm chat-bubble">{msg.text}</div>
+                      <div className="relative group text-sm chat-bubble pr-8">
+                        {msg.text}
+                        {renderDropdown(msg)}
+                      </div>
                     )}
                   </div>
                 ))
