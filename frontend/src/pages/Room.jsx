@@ -5,7 +5,11 @@ import MemberPanel from "../components/room/MemberPanel";
 import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
 import io from "socket.io-client";
-import { fetchMessage, uploadFile, removeMessage } from "../store/action/chat.action";
+import {
+  fetchMessage,
+  uploadFile,
+  removeMessage,
+} from "../store/action/chat.action";
 import { getGroupMembers } from "../store/action/group.action";
 
 const API = import.meta.env.VITE_API_URL;
@@ -30,14 +34,18 @@ const Room = () => {
     (msg, index, self) => index === self.findIndex((m) => m._id === msg._id),
   );
 
+  const [showChat, setShowChat] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  const myMember = members.find(
-    (m) => m.user?._id === user?.id || m.user?._id === user?._id,
-  );
+  const currentUserId = String(user?.id || user?._id || "");
+  const myMember = members.find((m) => {
+    const memberUserId = String(m.user?._id || m.user || "");
+    return memberUserId === currentUserId;
+  });
   const isHost = myMember?.role === "admin";
 
   // fectch message
@@ -82,6 +90,9 @@ const Room = () => {
 
     const socket = socketRef.current;
 
+    socket.on("connect", () => {
+      socket.emit("join-group", groupId);
+    });
     socket.emit("join-group", groupId);
 
     socket.on("room:presence-update", (data) => {
@@ -141,7 +152,11 @@ const Room = () => {
     });
 
     socket.on("receive-message", (data) => {
-      setNewMessages((prev) => [...prev, data]);
+      const msgData = {
+        ...data,
+        _id: data._id || `temp-${Date.now()}-${Math.random()}`,
+      };
+      setNewMessages((prev) => [...prev, msgData]);
     });
 
     socket.on("group:deleted", (data) => {
@@ -236,14 +251,25 @@ const Room = () => {
   const renderDropdown = (msg) => {
     if (!isOwnMessage(msg)) return null;
     return (
-      <div className="absolute top-1 right-1 dropdown dropdown-end opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute transition-opacity opacity-0 top-1 right-1 dropdown dropdown-end group-hover:opacity-100">
         <div
           tabIndex={0}
           role="button"
-          className="btn btn-ghost btn-xs btn-circle h-6 w-6 min-h-0 p-0 text-base-content"
+          className="w-6 h-6 min-h-0 p-0 btn btn-ghost btn-xs btn-circle text-base-content"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
         <ul
@@ -273,7 +299,7 @@ const Room = () => {
               : "📎";
 
     return (
-      <div className="relative group chat-bubble pr-8">
+      <div className="relative pr-8 group chat-bubble">
         <div className="flex items-start gap-2">
           <span className="text-2xl">{fileIcon}</span>
           <div className="flex-1 min-w-0">
@@ -345,20 +371,59 @@ const Room = () => {
             </p>
           </div>
         </div>
-        <div className="flex-none">
-          <span className="mr-4 badge badge-primary badge-sm">
+        <div className="flex items-center flex-none gap-2">
+          <span className="hidden mr-4 badge badge-primary badge-sm sm:inline-flex">
             {isHost ? "🎯 Host View" : "🎓 Student View"}
           </span>
+
+          <div className="mr-2 dropdown dropdown-end lg:hidden">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-circle"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content mt-3 z-[50] p-2 shadow bg-base-100 rounded-box w-40"
+            >
+              <li>
+                <a onClick={() => setShowMembers(true)}>👥 Members</a>
+              </li>
+              <li>
+                <a onClick={() => setShowChat(true)}>💬 Chat</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
       {/* Main Layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="relative flex flex-col flex-1 overflow-y-auto lg:flex-row lg:overflow-hidden">
         {/* Left Panel - Members & Presence */}
-        <MemberPanel members={members} onlineUsers={onlineUsers} />
+        <MemberPanel
+          members={members}
+          onlineUsers={onlineUsers}
+          showOnMobile={showMembers}
+          onClose={() => setShowMembers(false)}
+        />
 
         {/* Center Panel - Timer */}
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-h-[400px] order-1 lg:order-2">
           <TimerDisplay session={timerSession} isHost={isHost} />
           <div className="border-t border-base-300">
             <TimerControls
@@ -371,8 +436,24 @@ const Room = () => {
         </div>
 
         {/* Right Panel - Chat */}
-        <div className="flex flex-col border-l w-96 bg-base-100 border-base-300">
-          <div className="flex flex-col h-full">
+        <div
+          className={`
+          absolute inset-0 z-50 lg:static lg:z-auto
+          flex-col lg:border-l w-full lg:w-96 bg-base-100 border-base-300
+          ${showChat ? "flex" : "hidden lg:flex"}
+          order-3 lg:order-3
+        `}
+        >
+          <div className="flex items-center justify-between p-3 border-b shadow-sm border-base-300 lg:hidden">
+            <h2 className="text-lg font-bold">Group Chat</h2>
+            <button
+              className="btn btn-ghost btn-sm btn-circle"
+              onClick={() => setShowChat(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex flex-col flex-1 overflow-hidden">
             <div className="flex-1 p-4 overflow-y-auto">
               {messages.length === 0 ? (
                 <div className="text-center text-base-content/40">
@@ -392,7 +473,7 @@ const Room = () => {
                     {msg.messageType === "file" ? (
                       renderFileMessage(msg)
                     ) : (
-                      <div className="relative group text-sm chat-bubble pr-8">
+                      <div className="relative pr-8 text-sm group chat-bubble">
                         {msg.text}
                         {renderDropdown(msg)}
                       </div>
@@ -428,7 +509,14 @@ const Room = () => {
                   </div>
                 </div>
               )}
-              <div className="flex gap-2">
+              <form
+                className="flex gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (selectedFile) handleFileUpload();
+                  else sendMessage();
+                }}
+              >
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -437,6 +525,7 @@ const Room = () => {
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z,.jpg,.jpeg,.png,.gif,.webp"
                 />
                 <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="btn btn-ghost btn-square btn-sm"
                   disabled={uploading}
@@ -447,10 +536,6 @@ const Room = () => {
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    (selectedFile ? handleFileUpload() : sendMessage())
-                  }
                   placeholder={
                     selectedFile
                       ? "Add a caption (optional)..."
@@ -460,7 +545,7 @@ const Room = () => {
                   disabled={uploading}
                 />
                 <button
-                  onClick={selectedFile ? handleFileUpload : sendMessage}
+                  type="submit"
                   className="btn btn-primary btn-sm"
                   disabled={uploading || (!chatInput.trim() && !selectedFile)}
                 >
@@ -470,7 +555,7 @@ const Room = () => {
                     "Send"
                   )}
                 </button>
-              </div>
+              </form>
             </div>
           </div>
         </div>

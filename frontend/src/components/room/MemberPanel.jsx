@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-const MemberPanel = ({ members = [], onlineUsers = [] }) => {
+const MemberPanel = ({ members = [], onlineUsers = [], onClose, showOnMobile }) => {
 
   // Convert to Set for O(1) lookup
   const onlineSet = useMemo(() => new Set(onlineUsers), [onlineUsers]);
@@ -9,17 +9,27 @@ const MemberPanel = ({ members = [], onlineUsers = [] }) => {
   const totalCount = members.length;
 
   return (
-    <div className="flex flex-col w-64 border-r bg-base-100 border-base-300">
+    <div className={`
+      flex-col w-full lg:w-64 border-b lg:border-b-0 lg:border-r bg-base-100 border-base-300 shrink-0 order-2 lg:order-1
+      absolute inset-0 z-50 lg:static lg:z-auto
+      ${showOnMobile ? "flex" : "hidden lg:flex"}
+    `}>
 
       {/* Header */}
-      <div className="p-4 border-b border-base-300">
-        <h2 className="text-lg font-bold">Members</h2>
-
-        <p className="text-xs text-base-content/60">
-          <span className="font-semibold text-success">{onlineCount} online</span>
-          {" • "}
-          {totalCount} total
-        </p>
+      <div className="flex items-center justify-between p-4 border-b border-base-300">
+        <div>
+          <h2 className="text-lg font-bold">Members</h2>
+          <p className="text-xs text-base-content/60">
+            <span className="font-semibold text-success">{onlineCount} online</span>
+            {" • "}
+            {totalCount} total
+          </p>
+        </div>
+        {onClose && (
+          <button className="btn btn-ghost btn-sm btn-circle lg:hidden" onClick={onClose}>
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Members List */}

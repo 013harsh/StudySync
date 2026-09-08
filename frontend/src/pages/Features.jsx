@@ -85,7 +85,7 @@ const HeroSection = () => (
         initial={{ y: 22, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="text-3xl font-black leading-[1.1] tracking-tight md:text-6xl lg:text-5xl text-base-content "
+        className="text-3xl font-black leading-[1.1] tracking-tight md:text-5xl lg:text-6xl text-base-content "
       >
         Your Study Network Simplified
       </motion.h1>
@@ -140,7 +140,7 @@ const Features = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid max-w-2xl grid-cols-2 gap-5 mx-auto"
+          className="grid max-w-2xl grid-cols-1 md:grid-cols-2 gap-5 mx-auto"
         >
           {/* ── Create Group Card ── */}
           <motion.div

@@ -100,10 +100,10 @@ const Home = () => {
 
               {/* Main Heading */}
               <h1 className="mb-6 font-black leading-tight tracking-tight text-base-content font-['Inter',sans-serif]">
-                <span className="block text-5xl md:text-6xl lg:text-7xl">
+                <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl break-words">
                   WELCOME TO
                 </span>
-                <span className="block mt-2 text-6xl md:text-7xl lg:text-8xl text-primary">
+                <span className="block mt-2 text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-primary break-words">
                   STUDYSYNC
                 </span>
               </h1>

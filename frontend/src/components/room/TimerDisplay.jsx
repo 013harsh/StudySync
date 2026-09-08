@@ -122,7 +122,7 @@ const TimerDisplay = ({ session, isHost }) => {
         </div>
 
         {/* Timer Display */}
-        <div className={`text-8xl font-mono font-bold mb-8 ${statusColor}`}>
+        <div className={`text-5xl sm:text-7xl md:text-8xl font-mono font-bold mb-8 ${statusColor}`}>
           {displayTime}
         </div>
 

@@ -35,7 +35,7 @@ const TimerControls = ({ socket, groupId, session, isHost }) => {
 
   const handleEnd = () => {
     if (!socket || !groupId) return;
-    
+
     if (confirm("Are you sure you want to end the timer session?")) {
       socket.emit("room:end-session", { groupId });
     }
@@ -98,7 +98,9 @@ const TimerControls = ({ socket, groupId, session, isHost }) => {
                 <>
                   <div className="form-control">
                     <label className="label">
-                      <span className="font-semibold label-text">Duration (minutes)</span>
+                      <span className="font-semibold label-text">
+                        Duration (minutes)
+                      </span>
                     </label>
                     <input
                       type="number"
@@ -162,10 +164,7 @@ const TimerControls = ({ socket, groupId, session, isHost }) => {
                 ▶️ Resume
               </button>
             )}
-            <button
-              onClick={handleEnd}
-              className="btn btn-error btn-lg"
-            >
+            <button onClick={handleEnd} className="btn btn-error btn-lg">
               ⏹️ End
             </button>
           </div>
