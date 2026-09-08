@@ -132,6 +132,7 @@ const getGroupMembers = async (req, res) => {
 
     const members = group.members.map((m) => ({
       user: {
+        _id: m.user._id,
         fullName: m.user.fullName,
       },
       role: m.role,

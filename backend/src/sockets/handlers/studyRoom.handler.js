@@ -1,3 +1,4 @@
+const Group = require("../../model/group.model");
 const sessions = new Map();
 
 module.exports = (io, socket) => {
@@ -13,7 +14,7 @@ module.exports = (io, socket) => {
     }
   });
 
-  socket.on("room:start-session", ({ groupId, mode, duration }) => {
+  socket.on("room:start-session", async ({ groupId, mode, duration }) => {
     try {
       if (!userId || !groupId) {
         return socket.emit("error", "Missing required fields");
@@ -25,6 +26,21 @@ module.exports = (io, socket) => {
 
       if (mode === "countdown" && (!duration || duration <= 0)) {
         return socket.emit("error", "Duration required for countdown");
+      }
+
+      // Verify user is an admin
+      const group = await Group.findOne({
+        _id: groupId,
+        members: {
+          $elemMatch: {
+            user: userId,
+            role: "admin",
+          },
+        },
+      });
+
+      if (!group) {
+        return socket.emit("error", "Only group admins can start a session");
       }
 
       const session = {
