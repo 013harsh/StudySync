@@ -8,7 +8,6 @@ import QuickActions from "../components/dashboard/QuickActions";
 import GroupsTable from "../components/dashboard/GroupsTable";
 import InviteCodes from "../components/dashboard/InviteCodes";
 
-
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return "Good morning";
@@ -50,16 +49,16 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-base-200">
       <div className="px-4 py-10 mx-auto max-w-7xl sm:px-6 lg:px-10">
-        <div className="rounded-2xl bg-gradient-to-r from-primary to-secondary px-8 py-7 mb-8 shadow-lg shadow-primary/20 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 px-8 mb-8 shadow-lg rounded-2xl bg-gradient-to-r from-primary to-secondary py-7 shadow-primary/20">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary-content/80">
+            <p className="text-sm font-semibold tracking-widest uppercase text-primary-content/80">
               {getGreeting()},
             </p>
-            <h1 className="text-4xl lg:text-5xl font-black text-primary-content mt-1">
+            <h1 className="mt-1 text-4xl font-black lg:text-5xl text-primary-content">
               {firstName} {lastName}
             </h1>
           </div>
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-content/20 text-primary-content font-bold text-sm backdrop-blur-sm border border-primary-content/30">
+          <span className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold border rounded-full bg-primary-content/20 text-primary-content backdrop-blur-sm border-primary-content/30">
             🎓 {role === "admin" ? "Administrator" : "Student"}
           </span>
         </div>

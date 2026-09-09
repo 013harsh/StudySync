@@ -76,3 +76,23 @@ export const deleteGroup = (groupId) => async (dispatch) => {
     console.log(error);
   }
 };
+
+export const leaveGroup = (groupId) => async (dispatch) => {
+  try {
+    const res = await axios.put(
+      `/api/group/leave/${groupId}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
+
+    console.log(res.data);
+    dispatch(deleteg(groupId));
+    return res.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "Failed to leave group";
+    throw new Error(errorMessage);
+  }
+};

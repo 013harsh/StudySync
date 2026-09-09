@@ -117,6 +117,42 @@ const Room = () => {
       setOnlineUsers((prev) => prev.filter((id) => id !== data.userId));
     });
 
+    socket.on("group:user-joined", (data) => {
+      console.log("Group member joined:", data);
+      if (data.groupId === groupId) {
+        setMembers((prev) => {
+          if (prev.some((m) => String(m.user?._id || m.user) === String(data.userId))) {
+            return prev;
+          }
+          return [
+            ...prev,
+            {
+              user: { _id: data.userId, fullName: data.fullName },
+              role: "member",
+              joinedAt: new Date().toISOString(),
+            },
+          ];
+        });
+      }
+    });
+
+    socket.on("group:user-left", (data) => {
+      console.log("Group member left:", data);
+      if (data.groupId === groupId) {
+        setMembers((prev) => {
+          let updated = prev.filter((m) => String(m.user?._id || m.user) !== String(data.userId));
+          if (data.newAdmin) {
+            updated = updated.map((m) => 
+              String(m.user?._id || m.user) === String(data.newAdmin) 
+                ? { ...m, role: "admin" } 
+                : m
+            );
+          }
+          return updated;
+        });
+      }
+    });
+
     socket.on("error", (error) => {
       console.error("Socket error:", error);
     });

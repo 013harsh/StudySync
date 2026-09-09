@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteGroup } from "../../store/action/group.action";
+import { deleteGroup, leaveGroup } from "../../store/action/group.action";
 
 function TypeBadge({ type }) {
   return type === "study" ? (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded-full">📚 Study</span>
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded-full">
+      📚 Study
+    </span>
   ) : (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-secondary bg-secondary/10 border border-secondary/20 rounded-full">
       👥 Friend
@@ -14,9 +16,13 @@ function TypeBadge({ type }) {
 
 function RoleBadge({ role }) {
   return role === "admin" ? (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-warning-content bg-warning/20 border border-warning/30 rounded-full">⭐ Admin</span>
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-warning-content bg-warning/20 border border-warning/30 rounded-full">
+      ⭐ Admin
+    </span>
   ) : (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-base-content/70 bg-base-300 border border-base-300 rounded-full">Member</span>
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-base-content/70 bg-base-300 border border-base-300 rounded-full">
+      Member
+    </span>
   );
 }
 
@@ -35,6 +41,10 @@ const GroupsTable = ({ groups, loading, error }) => {
   const handleDelete = async (e, groupId) => {
     e.stopPropagation();
     dispatch(deleteGroup(groupId));
+  };
+  const handleLeave = async (e, groupId) => {
+    e.stopPropagation();
+    dispatch(leaveGroup(groupId));
   };
 
   const handleRowClick = (groupId) => {
@@ -118,12 +128,19 @@ const GroupsTable = ({ groups, loading, error }) => {
                 {formatDate(g.createdAt)}
               </td>
               <td className="flex items-center gap-2">
-                {g.myRole === "admin" && (
+                {g.myRole === "admin" ? (
                   <button
                     onClick={(e) => handleDelete(e, g._id)}
                     className="btn btn-error btn-sm"
                   >
                     Delete
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => handleLeave(e, g._id)}
+                    className="btn btn-error btn-sm"
+                  >
+                    Leave
                   </button>
                 )}
               </td>
