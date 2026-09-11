@@ -5,11 +5,11 @@ import { deleteGroup, leaveGroup } from "../../store/action/group.action";
 function TypeBadge({ type }) {
   return type === "study" ? (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded-full">
-      📚 Study
+      Study
     </span>
   ) : (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-secondary bg-secondary/10 border border-secondary/20 rounded-full">
-      👥 Friend
+      Friend
     </span>
   );
 }
@@ -17,7 +17,7 @@ function TypeBadge({ type }) {
 function RoleBadge({ role }) {
   return role === "admin" ? (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-warning-content bg-warning/20 border border-warning/30 rounded-full">
-      ⭐ Admin
+      Admin
     </span>
   ) : (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-base-content/70 bg-base-300 border border-base-300 rounded-full">

@@ -25,7 +25,7 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate("/home");
+      navigate("/dashboard");
     } else {
       setError(result.error);
     }

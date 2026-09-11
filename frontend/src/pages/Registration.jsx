@@ -97,7 +97,7 @@ const Registration = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 className="w-full input input-bordered"
-                placeholder="John"
+                placeholder="firstName"
               />
             </div>
 
@@ -113,7 +113,7 @@ const Registration = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 className="w-full input input-bordered"
-                placeholder="Doe"
+                placeholder="lastName"
               />
             </div>
 
