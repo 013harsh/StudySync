@@ -35,112 +35,51 @@ StudySync is a comprehensive full-stack web application designed to facilitate o
 
 ## 📂 Project Structure
 
-Directory structure:
-└── 013harsh-studysync/
-    ├── README.md
-    ├── backend/
-    │   ├── package.json
-    │   ├── server.js
-    │   ├── public/
-    │   │   └── index.html
-    │   ├── src/
-    │   │   ├── app.js
-    │   │   ├── controller/
-    │   │   │   ├── auth.controller.js
-    │   │   │   ├── chat.controller.js
-    │   │   │   └── group.controller.js
-    │   │   ├── db/
-    │   │   │   └── db.js
-    │   │   ├── middleware/
-    │   │   │   ├── auth.middleware.js
-    │   │   │   ├── socket.middleware.js
-    │   │   │   └── upload.middleware.js
-    │   │   ├── model/
-    │   │   │   ├── chat.model.js
-    │   │   │   ├── group.model.js
-    │   │   │   └── user.model.js
-    │   │   ├── routes/
-    │   │   │   ├── auth.routes.js
-    │   │   │   ├── chat.routes.js
-    │   │   │   └── group.routes.js
-    │   │   ├── services/
-    │   │   │   └── chat.service.js
-    │   │   └── sockets/
-    │   │       ├── io.js
-    │   │       ├── socket.server.js
-    │   │       └── handlers/
-    │   │           ├── chat.handler.js
-    │   │           ├── group.handler.js
-    │   │           ├── studyRoom.handler.js
-    │   │           └── webrtc.handler.js
-    │   └── uploads/
-    │       └── documents/
-    │           └── .gitkeep
-    └── frontend/
-        ├── eslint.config.js
-        ├── index.html
-        ├── package.json
-        ├── postcss.config.js
-        ├── tailwind.config.js
-        ├── vite.config.js
-        ├── .env.example
-        └── src/
-            ├── App.jsx
-            ├── index.css
-            ├── main.jsx
-            ├── components/
-            │   ├── ErrorBoundary.jsx
-            │   ├── Footer.jsx
-            │   ├── Hero.jsx
-            │   ├── NavBar.jsx
-            │   ├── ProtectedRoute.jsx
-            │   ├── dashboard/
-            │   │   ├── GroupsTable.jsx
-            │   │   ├── InviteCodes.jsx
-            │   │   ├── QuickActions.jsx
-            │   │   ├── StatCard.jsx
-            │   │   └── UserProfileCard.jsx
-            │   ├── groups/
-            │   │   ├── CreateGroupModal.jsx
-            │   │   └── JoinGroupModal.jsx
-            │   └── room/
-            │       ├── CallUI.jsx
-            │       ├── MemberPanel.jsx
-            │       ├── TimerControls.jsx
-            │       └── TimerDisplay.jsx
-            ├── context/
-            │   └── ThemeContext.jsx
-            ├── pages/
-            │   ├── Account.jsx
-            │   ├── Dashboard.jsx
-            │   ├── Features.jsx
-            │   ├── Home.jsx
-            │   ├── Login.jsx
-            │   ├── Registration.jsx
-            │   ├── Room.jsx
-            │   └── footer/
-            │       ├── About.jsx
-            │       ├── Contact.jsx
-            │       ├── Privacy.jsx
-            │       └── Terms.jsx
-            ├── Routes/
-            │   └── Routes.jsx
-            ├── store/
-            │   ├── store.jsx
-            │   ├── action/
-            │   │   ├── auth.action.jsx
-            │   │   ├── chat.action.jsx
-            │   │   └── group.action.jsx
-            │   └── reducer/
-            │       ├── auth.slice.jsx
-            │       ├── chat.slice.jsx
-            │       └── group.slice.jsx
-            └── utils/
-                └── webrtc.js
+StudySync/
+├── .vscode/               # Editor configurations
+├── backend/               # Node.js + Express Backend
+│   ├── src/
+│   │   ├── Server/        # Server configurations & setup
+│   │   ├── controller/    # Route controllers (handle HTTP requests)
+│   │   ├── db/            # Database connection & configurations (MongoDB/Redis)
+│   │   ├── middleware/    # Express middlewares (Auth, Error handling, etc.)
+│   │   ├── model/         # Mongoose schemas & models
+│   │   ├── repositories/  # Data access layer (abstracts DB operations)
+│   │   ├── routes/        # API route definitions
+│   │   ├── services/      # Core business logic
+│   │   ├── sockets/       # Socket.io event handlers and logic
+│   │   └── app.js         # Express app initialization
+│   ├── uploads/           # Directory for user-uploaded files via Multer
+│   ├── .env               # Backend environment variables
+│   ├── package.json       # Backend dependencies
+│   └── server.js          # Backend entry point
+│
+├── frontend/              # React + Vite Frontend
+│   ├── public/            # Static assets (images, icons)
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── context/       # React Context API providers
+│   │   ├── pages/         # Page-level components (Views)
+│   │   ├── Routes/        # Routing configuration (React Router)
+│   │   ├── store/         # Redux Toolkit store, slices, and actions
+│   │   ├── utils/         # Helper functions and utilities
+│   │   ├── App.jsx        # Root React component
+│   │   ├── index.css      # Global styles (Tailwind CSS)
+│   │   └── main.jsx       # React DOM rendering entry point
+│   ├── .env.example       # Frontend environment variables template
+│   ├── package.json       # Frontend dependencies
+│   ├── tailwind.config.js # Tailwind CSS configuration
+│   └── vite.config.js     # Vite configuration
+│
+├── .gitignore
+└── README.md              # Project documentation
 
 ## GitDiagram
 
 <img width="1234" height="1536" alt="image" src="https://github.com/user-attachments/assets/21544805-a31f-4002-9ae4-91d57bc68ed4" />
+
+<img width="1762" height="696" alt="image" src="https://github.com/user-attachments/assets/4c90fa92-33a6-45cd-a8f0-7f063d546bc2" />
+
 
 ## ⚙️ Getting Started
 ### Prerequisites
