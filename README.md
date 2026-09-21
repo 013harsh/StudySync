@@ -35,48 +35,13 @@ StudySync is a comprehensive full-stack web application designed to facilitate o
 
 ## 📂 Project Structure
 
-StudySync/
-├── .vscode/               # Editor configurations
-├── backend/               # Node.js + Express Backend
-│   ├── src/
-│   │   ├── Server/        # Server configurations & setup
-│   │   ├── controller/    # Route controllers (handle HTTP requests)
-│   │   ├── db/            # Database connection & configurations (MongoDB/Redis)
-│   │   ├── middleware/    # Express middlewares (Auth, Error handling, etc.)
-│   │   ├── model/         # Mongoose schemas & models
-│   │   ├── repositories/  # Data access layer (abstracts DB operations)
-│   │   ├── routes/        # API route definitions
-│   │   ├── services/      # Core business logic
-│   │   ├── sockets/       # Socket.io event handlers and logic
-│   │   └── app.js         # Express app initialization
-│   ├── uploads/           # Directory for user-uploaded files via Multer
-│   ├── .env               # Backend environment variables
-│   ├── package.json       # Backend dependencies
-│   └── server.js          # Backend entry point
-│
-├── frontend/              # React + Vite Frontend
-│   ├── public/            # Static assets (images, icons)
-│   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── context/       # React Context API providers
-│   │   ├── pages/         # Page-level components (Views)
-│   │   ├── Routes/        # Routing configuration (React Router)
-│   │   ├── store/         # Redux Toolkit store, slices, and actions
-│   │   ├── utils/         # Helper functions and utilities
-│   │   ├── App.jsx        # Root React component
-│   │   ├── index.css      # Global styles (Tailwind CSS)
-│   │   └── main.jsx       # React DOM rendering entry point
-│   ├── .env.example       # Frontend environment variables template
-│   ├── package.json       # Frontend dependencies
-│   ├── tailwind.config.js # Tailwind CSS configuration
-│   └── vite.config.js     # Vite configuration
-│
-├── .gitignore
-└── README.md              # Project documentation
+<img width="924" height="1292" alt="image" src="https://github.com/user-attachments/assets/5d067aa4-c612-4265-bd5a-88626f8f2309" />
 
 ## GitDiagram
 
 <img width="1234" height="1536" alt="image" src="https://github.com/user-attachments/assets/21544805-a31f-4002-9ae4-91d57bc68ed4" />
+
+## GitDiagram 2
 
 <img width="1762" height="696" alt="image" src="https://github.com/user-attachments/assets/4c90fa92-33a6-45cd-a8f0-7f063d546bc2" />
 
