@@ -4,6 +4,8 @@ const groupModel = require("../model/group.model");
 const chatModel = require("../model/chat.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID?.trim());
 
 async function registerUser(req, res) {
   try {
@@ -214,6 +216,68 @@ async function deleteUser(req, res) {
   }
 }
 
+async function googleLogin(req, res) {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ message: "Google token is required" });
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID?.trim(),
+    });
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const firstName = payload.given_name;
+    const lastName = payload.family_name || "";
+
+    let user = await userModel.findOne({ email });
+    if (!user) {
+      // Create user if not exists
+      const randomPassword = await bcrypt.hash(email + Date.now().toString(), 10);
+      user = await userModel.create({
+        fullName: { firstName, lastName },
+        email,
+        password: randomPassword,
+      });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET not defined");
+    }
+
+    const jwtToken = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+    );
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    const userResponse = {
+      _id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+    };
+    return res
+      .status(200)
+      .json({ message: "User logged in with Google successfully", user: userResponse });
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    return res.status(500).json({ message: "Something went wrong with Google Login" });
+  }
+}
+
 module.exports = {
   registerUser,
   loginUser,
@@ -221,4 +285,5 @@ module.exports = {
   updateProfile,
   userdetails,
   deleteUser,
+  googleLogin,
 };
