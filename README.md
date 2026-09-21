@@ -35,7 +35,7 @@ StudySync is a comprehensive full-stack web application designed to facilitate o
 
 ## 📂 Project Structure
 
-<img width="924" height="1292" alt="image" src="https://github.com/user-attachments/assets/5d067aa4-c612-4265-bd5a-88626f8f2309" />
+<img width="1424" height="1328" alt="image" src="https://github.com/user-attachments/assets/34218e7d-ace6-4096-b10a-48a0818d1ec0" />
 
 ## GitDiagram
 
