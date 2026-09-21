@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { userRegister } from "../store/action/auth.action";
+import { userRegister, userGoogleLogin } from "../store/action/auth.action";
+import { GoogleLogin } from "@react-oauth/google";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -52,15 +53,31 @@ const Registration = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError(null);
+    setLoading(true);
+    const result = await dispatch(userGoogleLogin(credentialResponse.credential));
+    setLoading(false);
+    if (result.success) {
+      navigate("/dashboard");
+    } else {
+      setError(result.error);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError("Google Login Failed");
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-base-200">
-      <div className="w-full max-w-md shadow-xl card bg-base-100">
-        <div className="card-body">
-          <div className="mb-6 text-center">
+    <div className="flex min-h-[calc(100vh-4rem)] p-4 py-8 bg-base-200">
+      <div className="w-full max-w-md m-auto shadow-xl card bg-base-100">
+        <div className="card-body p-6">
+          <div className="mb-4 text-center">
             <h2 className="text-3xl font-bold text-base-content">
               Create Account
             </h2>
-            <p className="mt-2 text-base-content/70">
+            <p className="mt-1 text-base-content/70">
               Join us and start your journey
             </p>
           </div>
@@ -84,7 +101,7 @@ const Registration = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-2">
             <div className="form-control">
               <label className="label" htmlFor="firstName">
                 <span className="font-medium label-text">First Name</span>
@@ -165,7 +182,7 @@ const Registration = () => {
               />
             </div>
 
-            <div className="mt-6 form-control">
+            <div className="mt-4 form-control">
               <button
                 type="submit"
                 className="w-full btn btn-primary"
@@ -180,7 +197,17 @@ const Registration = () => {
             </div>
           </form>
 
-          <p className="mt-6 text-sm text-center text-base-content/70">
+          <div className="divider my-2">OR</div>
+          
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+            />
+          </div>
+
+          <p className="mt-4 text-sm text-center text-base-content/70">
             Already have an account?{" "}
             <button
               onClick={() => navigate("/login")}

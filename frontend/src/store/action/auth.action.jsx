@@ -30,6 +30,20 @@ export const userLogin = (data) => async (dispatch) => {
     return { success: false, error: message };
   }
 };
+export const userGoogleLogin = (token) => async (dispatch) => {
+  try {
+    const res = await axios.post("/api/auth/googleLogin", { token }, {
+      withCredentials: true,
+    });
+    console.log(res.data.user);
+    dispatch(loginSuccess(res.data.user));
+    return { success: true, user: res.data.user };
+  } catch (error) {
+    console.log("error", error);
+    const message = error.response?.data?.message || "Google Login failed";
+    return { success: false, error: message };
+  }
+};
 export const userLogout = (data) => async (dispatch) => {
   try {
     await axios.post("/api/auth/userLogout", data, {
