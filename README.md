@@ -111,9 +111,16 @@ A real-time study collaboration platform where students can create/join study gr
         └── utils/
             └── webrtc.js
 ```
+## GitDiagram
+
+<img width="1234" height="1536" alt="image" src="https://github.com/user-attachments/assets/21544805-a31f-4002-9ae4-91d57bc68ed4" />
 
 ---
+## GitDiagram 2
 
+<img width="1762" height="696" alt="image" src="https://github.com/user-attachments/assets/4c90fa92-33a6-45cd-a8f0-7f063d546bc2" />
+
+----
 ## 🚀 Getting Started
 
 ### Prerequisites
