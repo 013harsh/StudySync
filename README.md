@@ -1,109 +1,199 @@
-# StudySync
+# StudySync 📚
 
-StudySync is a comprehensive full-stack web application designed to facilitate online learning and collaboration. Built with a modern tech stack, it features real-time communication, state management, and a sleek user interface.
+A real-time study collaboration platform where students can create/join study groups, chat, share documents, video call, and track study sessions with built-in timers — all in one place.
 
-## 🚀 Features
+**Live Demo:** [Add your deployed link here]
 
-- **User Authentication**: Secure login and registration using JSON Web Tokens (JWT) and Google OAuth.
-- **Real-Time Communication**: Integrated WebSockets (Socket.io) for real-time interactions, chat, or notifications.
-- **State Management**: Robust frontend state handling utilizing Redux Toolkit.
-- **Responsive UI**: Beautiful and modern user interface built with React, Tailwind CSS, DaisyUI, and Framer Motion for animations.
-- **File Uploads**: Support for uploading and managing files/resources via Multer.
-- **Caching & Performance**: Redis integration on the backend for fast data retrieval and session management.
+---
+
+## ✨ Features
+
+- 🔐 **Authentication** — secure signup/login with protected routes
+- 👥 **Study Groups** — create groups, generate/share invite codes, join existing groups
+- 💬 **Real-time Chat** — group messaging powered by Socket.IO
+- 📞 **Video Calls** — peer-to-peer calling in study rooms via WebRTC
+- ⏱️ **Study Timers** — shared timer controls/display for focused study sessions (e.g. Pomodoro-style)
+- 📁 **Document Uploads** — share files/documents within groups
+- 📊 **Dashboard** — stats cards, groups table, invite codes, and user profile overview
+- 🌗 **Theming** — light/dark mode via Theme Context
+- 📱 **Responsive UI** — built with Tailwind CSS
+
+---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **Framework**: React 19 with Vite
-- **Styling**: Tailwind CSS & DaisyUI
-- **State Management**: Redux Toolkit
-- **Routing**: React Router DOM
-- **Real-Time**: Socket.io-client
-- **Animations**: Framer Motion, React TSParticles, React Snowfall
-- **Authentication**: React OAuth (Google)
-- **HTTP Client**: Axios
+**Frontend**
+- React (JSX) + Vite
+- Redux (actions/reducers via `store/`)
+- Tailwind CSS + PostCSS
+- Socket.IO Client
+- WebRTC (`utils/webrtc.js`)
+- React Router (`Routes/Routes.jsx`)
 
-### Backend
-- **Runtime Environment**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB (Mongoose)
-- **Caching**: Redis
-- **Real-Time**: Socket.io
-- **Authentication**: JWT, Google Auth Library, bcrypt
-- **File Uploads**: Multer
-- **Development**: Nodemon
+**Backend**
+- Node.js + Express (`app.js`, `server.js`)
+- Socket.IO (real-time chat, group events, study rooms, WebRTC signaling)
+- MongoDB (via `db.js` / Mongoose-style models)
+- JWT-based auth middleware
+- Multer-style upload middleware for document sharing
 
-## 📂 Project Structure
+---
 
-<img width="1424" height="1328" alt="image" src="https://github.com/user-attachments/assets/34218e7d-ace6-4096-b10a-48a0818d1ec0" />
+## 📁 Project Structure
 
-## GitDiagram
-
-<img width="1234" height="1536" alt="image" src="https://github.com/user-attachments/assets/21544805-a31f-4002-9ae4-91d57bc68ed4" />
-
-## GitDiagram 2
-
-<img width="1762" height="696" alt="image" src="https://github.com/user-attachments/assets/4c90fa92-33a6-45cd-a8f0-7f063d546bc2" />
-
-
-## ⚙️ Getting Started
-### Prerequisites
-
-Ensure you have the following installed:
-- Node.js (v18 or higher recommended)
-- MongoDB (running locally or a MongoDB Atlas URI)
-- Redis Server (running locally)
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/013harsh/StudySync.git
-cd StudySync
+```
+013harsh-studysync/
+├── backend/
+│   ├── server.js                     # Server entry point
+│   ├── public/
+│   │   └── index.html
+│   └── src/
+│       ├── app.js                    # Express app setup
+│       ├── controller/
+│       │   ├── auth.controller.js
+│       │   ├── chat.controller.js
+│       │   └── group.controller.js
+│       ├── db/
+│       │   └── db.js                 # DB connection
+│       ├── middleware/
+│       │   ├── auth.middleware.js
+│       │   ├── socket.middleware.js
+│       │   └── upload.middleware.js
+│       ├── model/
+│       │   ├── chat.model.js
+│       │   ├── group.model.js
+│       │   └── user.model.js
+│       ├── routes/
+│       │   ├── auth.routes.js
+│       │   ├── chat.routes.js
+│       │   └── group.routes.js
+│       ├── services/
+│       │   └── chat.service.js
+│       └── sockets/
+│           ├── io.js
+│           ├── socket.server.js
+│           └── handlers/
+│               ├── chat.handler.js
+│               ├── group.handler.js
+│               ├── studyRoom.handler.js
+│               └── webrtc.handler.js
+│
+└── frontend/
+    └── src/
+        ├── App.jsx
+        ├── main.jsx
+        ├── components/
+        │   ├── ErrorBoundary.jsx
+        │   ├── Footer.jsx
+        │   ├── Hero.jsx
+        │   ├── NavBar.jsx
+        │   ├── ProtectedRoute.jsx
+        │   ├── dashboard/            # GroupsTable, InviteCodes, QuickActions, StatCard, UserProfileCard
+        │   ├── groups/                # CreateGroupModal, JoinGroupModal
+        │   └── room/                  # CallUI, MemberPanel, TimerControls, TimerDisplay
+        ├── context/
+        │   └── ThemeContext.jsx
+        ├── pages/
+        │   ├── Account.jsx
+        │   ├── Dashboard.jsx
+        │   ├── Features.jsx
+        │   ├── Home.jsx
+        │   ├── Login.jsx
+        │   ├── Registration.jsx
+        │   ├── Room.jsx
+        │   └── footer/                # About, Contact, Privacy, Terms
+        ├── Routes/
+        │   └── Routes.jsx
+        ├── store/
+        │   ├── store.jsx
+        │   ├── action/                # auth, chat, group actions
+        │   └── reducer/               # auth, chat, group slices
+        └── utils/
+            └── webrtc.js
 ```
 
-### 2. Backend Setup
+---
 
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- MongoDB (local or Atlas)
+- npm or yarn
+
+### 1. Clone the repository
+```bash
+git clone <your-repo-url>
+cd 013harsh-studysync
+```
+
+### 2. Backend setup
 ```bash
 cd backend
 npm install
 ```
-
-Create a `.env` file in the `backend` directory based on `.env.example` (or set up the necessary environment variables):
-- `PORT` (e.g., 5000)
-- `MONGO_URI`
-- `JWT_SECRET`
-- `REDIS_URL`
-- Google OAuth credentials
-
-Start the backend development server:
+Create a `.env` file in `backend/` with your configuration, e.g.:
+```
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLIENT_URL=http://localhost:5173
+```
+Start the backend:
 ```bash
-npm run dev
+npm start
 ```
 
-### 3. Frontend Setup
-
+### 3. Frontend setup
 ```bash
 cd ../frontend
 npm install
+cp .env.example .env
 ```
-
-Create a `.env` file in the `frontend` directory based on `.env.example` (or set up the necessary environment variables, usually prefixed with `VITE_`).
-
-Start the frontend development server:
+Update `.env` with the backend API/socket URL, then start the dev server:
 ```bash
 npm run dev
 ```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-The frontend will typically run on `http://localhost:5173`.
+---
 
-## 📜 Scripts
+## 🧩 Key Modules
 
-### Backend (`/backend`)
-- `npm run dev`: Starts the backend server with nodemon for development.
-- `npm start`: Starts the backend server with node.
+| Module | Purpose |
+|---|---|
+| `sockets/handlers/chat.handler.js` | Real-time group chat events |
+| `sockets/handlers/group.handler.js` | Group membership/live updates |
+| `sockets/handlers/studyRoom.handler.js` | Study room presence/session events |
+| `sockets/handlers/webrtc.handler.js` | WebRTC signaling for video calls |
+| `utils/webrtc.js` (frontend) | Peer connection setup for calls |
+| `store/` (Redux) | Auth, chat, and group state management |
+| `middleware/upload.middleware.js` | Handles document uploads to `uploads/documents` |
 
-### Frontend (`/frontend`)
-- `npm run dev`: Starts the Vite development server.
-- `npm run build`: Builds the app for production to the `dist` folder.
-- `npm run preview`: Locally previews the production build.
-- `npm run lint`: Runs ESLint to check for code issues.
+---
+
+## 📦 Deployment
+
+- **Backend:** Deploy to any Node hosting (Render, Railway, EC2, etc.) with MongoDB connection configured.
+- **Frontend:** Build with `npm run build` and deploy the static output (Vercel, Netlify, etc.), pointing `.env` to the deployed backend URL.
+
+---
+
+## 📌 Roadmap / Ideas
+
+- [ ] File preview for uploaded documents
+- [ ] Group study session history/analytics
+- [ ] Push notifications for group activity
+- [ ] Mobile-responsive video call layout improvements
+
+---
+
+## 🙋 About
+
+Built by **Harsh** — a B.Tech Computer Science student and Full Stack (MERN) Developer, exploring real-time collaborative tools.
+
+---
+
+## 📄 License
+
+This project is open source. Feel free to fork and adapt it — attribution appreciated!
