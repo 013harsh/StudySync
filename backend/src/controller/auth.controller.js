@@ -41,12 +41,14 @@ async function registerUser(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "2d" },
     );
 
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     };
 
     res.cookie("token", token, cookieOptions);
@@ -98,12 +100,14 @@ async function loginUser(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "2d" },
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     });
 
     const userResponse = {
@@ -162,12 +166,14 @@ async function updateProfile(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "2d" },
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     });
 
     const userResponse = {
@@ -235,7 +241,10 @@ async function googleLogin(req, res) {
     let user = await userModel.findOne({ email });
     if (!user) {
       // Create user if not exists
-      const randomPassword = await bcrypt.hash(email + Date.now().toString(), 10);
+      const randomPassword = await bcrypt.hash(
+        email + Date.now().toString(),
+        10,
+      );
       user = await userModel.create({
         fullName: { firstName, lastName },
         email,
@@ -255,12 +264,14 @@ async function googleLogin(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "2d" },
     );
 
     res.cookie("token", jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 2 * 24 * 60 * 60 * 1000,
     });
 
     const userResponse = {
@@ -269,12 +280,15 @@ async function googleLogin(req, res) {
       fullName: user.fullName,
       role: user.role,
     };
-    return res
-      .status(200)
-      .json({ message: "User logged in with Google successfully", user: userResponse });
+    return res.status(200).json({
+      message: "User logged in with Google successfully",
+      user: userResponse,
+    });
   } catch (error) {
     console.error("Google Login Error:", error);
-    return res.status(500).json({ message: "Something went wrong with Google Login" });
+    return res
+      .status(500)
+      .json({ message: "Something went wrong with Google Login" });
   }
 }
 
