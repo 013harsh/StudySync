@@ -128,7 +128,7 @@ const Home = () => {
                   to="/features"
                   className="transition-transform shadow-lg btn btn-primary btn-lg hover:scale-105"
                 >
-                  Get Started
+                  Features
                   <svg
                     className="w-5 h-5"
                     fill="none"

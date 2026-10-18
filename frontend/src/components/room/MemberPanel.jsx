@@ -1,7 +1,13 @@
 import React, { useMemo } from "react";
 
-const MemberPanel = ({ members = [], onlineUsers = [], onClose, showOnMobile }) => {
-
+const MemberPanel = ({
+  members = [],
+  onlineUsers = [],
+  onClose,
+  showOnMobile,
+  onCall,
+  currentUserId,
+}) => {
   // Convert to Set for O(1) lookup
   const onlineSet = useMemo(() => new Set(onlineUsers), [onlineUsers]);
 
@@ -9,24 +15,30 @@ const MemberPanel = ({ members = [], onlineUsers = [], onClose, showOnMobile }) 
   const totalCount = members.length;
 
   return (
-    <div className={`
+    <div
+      className={`
       flex-col w-full lg:w-64 border-b lg:border-b-0 lg:border-r bg-base-100 border-base-300 shrink-0 order-2 lg:order-1
       absolute inset-0 z-50 lg:static lg:z-auto
       ${showOnMobile ? "flex" : "hidden lg:flex"}
-    `}>
-
+    `}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-base-300">
         <div>
           <h2 className="text-lg font-bold">Members</h2>
           <p className="text-xs text-base-content/60">
-            <span className="font-semibold text-success">{onlineCount} online</span>
+            <span className="font-semibold text-success">
+              {onlineCount} online
+            </span>
             {" • "}
             {totalCount} total
           </p>
         </div>
         {onClose && (
-          <button className="btn btn-ghost btn-sm btn-circle lg:hidden" onClick={onClose}>
+          <button
+            className="btn btn-ghost btn-sm btn-circle lg:hidden"
+            onClick={onClose}
+          >
             ✕
           </button>
         )}
@@ -34,14 +46,12 @@ const MemberPanel = ({ members = [], onlineUsers = [], onClose, showOnMobile }) 
 
       {/* Members List */}
       <div className="flex-1 p-4 overflow-y-auto">
-
         {totalCount === 0 ? (
           <div className="text-center text-base-content/40">
             <p className="text-sm">No members found</p>
           </div>
         ) : (
           members.map((member) => {
-
             const user = member.user || member;
 
             const userId = user._id;
@@ -56,10 +66,8 @@ const MemberPanel = ({ members = [], onlineUsers = [], onClose, showOnMobile }) 
                 className={`flex items-center gap-3 p-2 mb-2 rounded-lg transition-colors
                 ${isOnline ? "bg-success/10" : "hover:bg-base-200"}`}
               >
-
                 {/* Avatar */}
                 <div className="relative avatar">
-
                   <div className="w-10 rounded-full ring-2 ring-offset-2 ring-offset-base-100 ring-base-300">
                     <img
                       src={`https://ui-avatars.com/api/?name=${firstName}&background=random`}
@@ -94,11 +102,20 @@ const MemberPanel = ({ members = [], onlineUsers = [], onClose, showOnMobile }) 
                   </div>
                 </div>
 
+                {/* Call Button */}
+                {userId !== currentUserId && isOnline && (
+                  <button
+                    onClick={() => onCall && onCall(userId)}
+                    className="btn btn-ghost btn-xs btn-circle text-primary"
+                    title="Start Call"
+                  >
+                    📞
+                  </button>
+                )}
               </div>
             );
           })
         )}
-
       </div>
 
       {/* Footer */}
@@ -111,7 +128,6 @@ const MemberPanel = ({ members = [], onlineUsers = [], onClose, showOnMobile }) 
           </span>
         </div>
       </div>
-
     </div>
   );
 };

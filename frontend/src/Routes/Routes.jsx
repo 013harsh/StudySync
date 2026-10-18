@@ -24,10 +24,32 @@ const AppRoutes = () => {
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/features" element={<ProtectedRoute><Features /></ProtectedRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
-      <Route path="/account" element={<ProtectedRoute><Account /> </ProtectedRoute>} />
-      <Route path="/room/:groupId" element={<ProtectedRoute><Room /></ProtectedRoute>} />
+      <Route path="/features" element={<Features />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            {" "}
+            <Dashboard />{" "}
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute>
+            <Account />{" "}
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/room/:groupId"
+        element={
+          <ProtectedRoute>
+            <Room />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };

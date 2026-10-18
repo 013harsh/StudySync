@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import MemberPanel from "../components/room/MemberPanel";
 import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
+import CallUI from "../components/room/CallUI";
 import io from "socket.io-client";
 import {
   fetchMessage,
@@ -11,6 +12,8 @@ import {
   removeMessage,
 } from "../store/action/chat.action";
 import { getGroupMembers } from "../store/action/group.action";
+import Loading from "../components/common/Loading";
+import Error from "../components/common/Error";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -21,6 +24,7 @@ const Room = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const socketRef = useRef(null);
+  const callUIRef = useRef(null);
   const dispatch = useDispatch();
 
   const [groupData, setGroupData] = useState(null);
@@ -121,7 +125,11 @@ const Room = () => {
       console.log("Group member joined:", data);
       if (data.groupId === groupId) {
         setMembers((prev) => {
-          if (prev.some((m) => String(m.user?._id || m.user) === String(data.userId))) {
+          if (
+            prev.some(
+              (m) => String(m.user?._id || m.user) === String(data.userId),
+            )
+          ) {
             return prev;
           }
           return [
@@ -140,12 +148,14 @@ const Room = () => {
       console.log("Group member left:", data);
       if (data.groupId === groupId) {
         setMembers((prev) => {
-          let updated = prev.filter((m) => String(m.user?._id || m.user) !== String(data.userId));
+          let updated = prev.filter(
+            (m) => String(m.user?._id || m.user) !== String(data.userId),
+          );
           if (data.newAdmin) {
-            updated = updated.map((m) => 
-              String(m.user?._id || m.user) === String(data.newAdmin) 
-                ? { ...m, role: "admin" } 
-                : m
+            updated = updated.map((m) =>
+              String(m.user?._id || m.user) === String(data.newAdmin)
+                ? { ...m, role: "admin" }
+                : m,
             );
           }
           return updated;
@@ -224,6 +234,12 @@ const Room = () => {
     });
 
     setChatInput("");
+  };
+
+  const handleCallUser = (targetUserId) => {
+    if (callUIRef.current) {
+      callUIRef.current.startCall(targetUserId);
+    }
   };
 
   const handleFileSelect = (e) => {
@@ -358,39 +374,28 @@ const Room = () => {
     );
   };
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-base-200">
-        <div className="text-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-base-content/60">Loading room...</p>
-        </div>
-      </div>
-    );
+    return <Loading message="Loading room..." />;
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-base-200">
-        <div className="max-w-md shadow-xl card bg-base-100">
-          <div className="card-body">
-            <h2 className="card-title text-error">Error</h2>
-            <p>{error}</p>
-            <div className="justify-end card-actions">
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="btn btn-primary"
-              >
-                Back to Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Error
+        message={error}
+        onBack={() => navigate("/dashboard")}
+        backText="Back to Dashboard"
+      />
     );
   }
 
   return (
     <div className="flex flex-col h-screen bg-base-200">
+      <CallUI
+        ref={callUIRef}
+        socket={socketRef.current}
+        user={user}
+        groupId={groupId}
+      />
+
       {/* Header */}
       <div className="border-b shadow-sm navbar bg-base-100 border-base-300">
         <div className="flex-1">
@@ -456,6 +461,8 @@ const Room = () => {
           onlineUsers={onlineUsers}
           showOnMobile={showMembers}
           onClose={() => setShowMembers(false)}
+          onCall={handleCallUser}
+          currentUserId={currentUserId}
         />
 
         {/* Center Panel - Timer */}

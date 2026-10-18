@@ -1,14 +1,17 @@
 import { useState, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { joinGroup } from "../../store/action/group.action";
+import { useNavigate } from "react-router-dom";
 
 const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
   const dialogRef = useRef(null);
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const navigate = useNavigate();
 
   const reset = () => {
     setCode("");
@@ -18,6 +21,10 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
   };
 
   const open = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
     reset();
     dialogRef.current?.showModal();
   };
@@ -26,7 +33,7 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    
+
     const trimmed = code.trim();
     if (!trimmed) {
       setError("Invite code is required");
@@ -34,7 +41,7 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
     }
 
     setLoading(true);
-    
+
     try {
       const result = await dispatch(joinGroup(trimmed));
 
@@ -44,7 +51,8 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
       setTimeout(() => {
         close();
         reset();
-      }, 1800);
+        navigate(`/room/${result.group._id}`);
+      }, 100);
     } catch (err) {
       setError(err.message || "Failed to join group");
     } finally {
@@ -56,7 +64,7 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
     <>
       <button
         onClick={open}
-        className="btn btn-secondary rounded-xl font-bold w-full text-sm h-10 min-h-0"
+        className="w-full h-10 min-h-0 text-sm font-bold btn btn-secondary rounded-xl"
       >
         → Join Group
       </button>
@@ -66,11 +74,11 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
         id={modalId}
         className="modal modal-bottom sm:modal-middle"
       >
-        <div className="modal-box rounded-2xl p-0 overflow-hidden max-w-md w-full">
+        <div className="w-full max-w-md p-0 overflow-hidden modal-box rounded-2xl">
           {/* Header */}
           <div className="px-6 pt-6 pb-4 bg-secondary text-secondary-content">
             <h3 className="text-2xl font-black">Join a Group</h3>
-            <p className="text-secondary-content/70 text-sm mt-1">
+            <p className="mt-1 text-sm text-secondary-content/70">
               Enter an invite code shared by the group admin.
             </p>
           </div>
@@ -78,57 +86,57 @@ const JoinGroupModal = ({ modalId = "join_group_modal", onSuccess }) => {
           {/* Body */}
           <form
             onSubmit={handleSubmit}
-            className="px-6 py-5 bg-base-100 flex flex-col gap-4"
+            className="flex flex-col gap-4 px-6 py-5 bg-base-100"
           >
             {success && (
               <div className="alert alert-success rounded-xl">
                 <span className="text-xl">✅</span>
-                <p className="font-semibold text-sm">{success}</p>
+                <p className="text-sm font-semibold">{success}</p>
               </div>
             )}
 
             {error && (
               <div className="alert alert-error rounded-xl">
                 <span className="text-xl">❌</span>
-                <p className="font-semibold text-sm">{error}</p>
+                <p className="text-sm font-semibold">{error}</p>
               </div>
             )}
 
             {/* Invite Code */}
-            <div className="form-control gap-1">
-              <label className="label py-0">
-                <span className="label-text font-bold text-base">
+            <div className="gap-1 form-control">
+              <label className="py-0 label">
+                <span className="text-base font-bold label-text">
                   Invite Code <span className="text-error">*</span>
                 </span>
               </label>
               <input
                 type="text"
                 placeholder="e.g. A1B2C3"
-                className="input input-bordered input-secondary w-full text-xl tracking-widest font-mono uppercase"
+                className="w-full font-mono text-xl tracking-widest uppercase input input-bordered input-secondary"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 maxLength={12}
                 disabled={loading}
                 autoComplete="off"
               />
-              <p className="text-xs text-base-content/40 mt-1">
+              <p className="mt-1 text-xs text-base-content/40">
                 Codes are case-insensitive. Ask your group admin for the code.
               </p>
             </div>
 
             {/* Actions */}
-            <div className="modal-action mt-2 flex gap-3">
+            <div className="flex gap-3 mt-2 modal-action">
               <button
                 type="button"
                 onClick={close}
-                className="btn btn-ghost flex-1 rounded-xl"
+                className="flex-1 btn btn-ghost rounded-xl"
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="btn btn-secondary flex-1 rounded-xl font-bold"
+                className="flex-1 font-bold btn btn-secondary rounded-xl"
                 disabled={loading}
               >
                 {loading ? (

@@ -1,13 +1,19 @@
-import { useState, useEffect, useRef } from "react";
-import { 
-  createPeerConnection, 
-  getUserMedia, 
+import {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import {
+  createPeerConnection,
+  getUserMedia,
   stopMediaStream,
   monitorConnectionState,
-  isWebRTCSupported 
+  isWebRTCSupported,
 } from "../../utils/webrtc";
 
-const CallUI = ({ socket, user, groupId }) => {
+const CallUI = forwardRef(({ socket, user, groupId }, ref) => {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [isCallActive, setIsCallActive] = useState(false);
@@ -26,7 +32,9 @@ const CallUI = ({ socket, user, groupId }) => {
   // Check WebRTC support on mount
   useEffect(() => {
     if (!isWebRTCSupported()) {
-      setError("WebRTC is not supported in your browser. Please use Chrome, Firefox, or Safari.");
+      setError(
+        "WebRTC is not supported in your browser. Please use Chrome, Firefox, or Safari.",
+      );
     }
   }, []);
 
@@ -48,11 +56,11 @@ const CallUI = ({ socket, user, groupId }) => {
     // Call answer received
     socket.on("call:answer", async ({ from, answer }) => {
       console.log("✅ Call answered by:", from);
-      
+
       if (peerConnectionRef.current) {
         try {
           await peerConnectionRef.current.setRemoteDescription(
-            new RTCSessionDescription(answer)
+            new RTCSessionDescription(answer),
           );
           setCallStatus("connected");
         } catch (err) {
@@ -65,18 +73,25 @@ const CallUI = ({ socket, user, groupId }) => {
     // ICE candidate received
     socket.on("call:ice-candidate", async ({ from, candidate }) => {
       console.log("🧊 ICE candidate from:", from);
-      
-      if (peerConnectionRef.current && peerConnectionRef.current.remoteDescription) {
+
+      if (
+        peerConnectionRef.current &&
+        peerConnectionRef.current.remoteDescription
+      ) {
         try {
           await peerConnectionRef.current.addIceCandidate(
-            new RTCIceCandidate(candidate)
+            new RTCIceCandidate(candidate),
           );
         } catch (err) {
           console.error("Error adding ICE candidate:", err);
         }
       } else {
         // Queue candidates if remote description not set yet
-        pendingCandidatesRef.current.push({ type: "candidate", data: candidate, from });
+        pendingCandidatesRef.current.push({
+          type: "candidate",
+          data: candidate,
+          from,
+        });
       }
     });
 
@@ -152,7 +167,7 @@ const CallUI = ({ socket, user, groupId }) => {
       monitorConnectionState(pc);
 
       // Add local tracks to peer connection
-      stream.getTracks().forEach(track => {
+      stream.getTracks().forEach((track) => {
         pc.addTrack(track, stream);
       });
 
@@ -210,7 +225,7 @@ const CallUI = ({ socket, user, groupId }) => {
       monitorConnectionState(pc);
 
       // Add local tracks
-      stream.getTracks().forEach(track => {
+      stream.getTracks().forEach((track) => {
         pc.addTrack(track, stream);
       });
 
@@ -231,9 +246,13 @@ const CallUI = ({ socket, user, groupId }) => {
       };
 
       // Process pending offer
-      const pendingOffer = pendingCandidatesRef.current.find(p => p.type === "offer");
+      const pendingOffer = pendingCandidatesRef.current.find(
+        (p) => p.type === "offer",
+      );
       if (pendingOffer) {
-        await pc.setRemoteDescription(new RTCSessionDescription(pendingOffer.data));
+        await pc.setRemoteDescription(
+          new RTCSessionDescription(pendingOffer.data),
+        );
 
         // Create and send answer
         const answer = await pc.createAnswer();
@@ -245,7 +264,9 @@ const CallUI = ({ socket, user, groupId }) => {
         });
 
         // Process pending ICE candidates
-        const pendingCandidates = pendingCandidatesRef.current.filter(p => p.type === "candidate");
+        const pendingCandidates = pendingCandidatesRef.current.filter(
+          (p) => p.type === "candidate",
+        );
         for (const { data } of pendingCandidates) {
           await pc.addIceCandidate(new RTCIceCandidate(data));
         }
@@ -308,7 +329,7 @@ const CallUI = ({ socket, user, groupId }) => {
   // Toggle mute
   const toggleMute = () => {
     if (localStream) {
-      localStream.getAudioTracks().forEach(track => {
+      localStream.getAudioTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
       setIsMuted(!isMuted);
@@ -318,12 +339,16 @@ const CallUI = ({ socket, user, groupId }) => {
   // Toggle video
   const toggleVideo = () => {
     if (localStream) {
-      localStream.getVideoTracks().forEach(track => {
+      localStream.getVideoTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
       setIsVideoOff(!isVideoOff);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    startCall,
+  }));
 
   if (!isWebRTCSupported()) {
     return (
@@ -416,6 +441,6 @@ const CallUI = ({ socket, user, groupId }) => {
       )}
     </div>
   );
-};
+});
 
 export default CallUI;

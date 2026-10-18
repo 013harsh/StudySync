@@ -1,15 +1,12 @@
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import Loading from "./common/Loading";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!isAuthenticated) {

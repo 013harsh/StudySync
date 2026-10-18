@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import CreateGroupModal from "../components/groups/CreateGroupModal";
 import JoinGroupModal from "../components/groups/JoinGroupModal";
+import YouTubeModal from "../components/groups/YouTubeModal";
 
-/* ─── Animation Variants ─── */
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -21,7 +23,6 @@ const itemVariants = {
   },
 };
 
-/* ─── Data ─── */
 const CORE_FEATURES = [
   {
     icon: "🎯",
@@ -46,6 +47,24 @@ const CORE_FEATURES = [
     title: "Real-time Sync",
     desc: "Everything updates live across every member's device.",
     color: "info",
+  },
+  {
+    icon: "📞",
+    title: "Live Video & Audio",
+    desc: "Connect seamlessly with peer-to-peer WebRTC calls directly in your room.",
+    color: "success",
+  },
+  {
+    icon: "▶️",
+    title: "YouTube Study Sync",
+    desc: "Stream lectures, tutorials, and focus playlists in sync with your group.",
+    color: "error",
+  },
+  {
+    icon: "🧑‍🤝‍🧑",
+    title: "Find Friends",
+    desc: "Find friends to study with.",
+    color: "primary",
   },
 ];
 
@@ -105,6 +124,8 @@ const HeroSection = () => (
 );
 
 const Features = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const [lastCreated, setLastCreated] = useState(null);
   const [lastJoined, setLastJoined] = useState(null);
 
@@ -133,14 +154,13 @@ const Features = () => {
           </span>
           <div className="flex-1 h-px bg-base-300" />
         </motion.div>
-
         {/* Cards grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid max-w-2xl grid-cols-1 md:grid-cols-2 gap-5 mx-auto"
+          className="grid max-w-6xl grid-cols-1 gap-5 mx-auto sm:grid-cols-2 lg:grid-cols-4"
         >
           {/* ── Create Group Card ── */}
           <motion.div
@@ -227,8 +247,103 @@ const Features = () => {
               </div>
             </div>
           </motion.div>
-        </motion.div>
 
+          {/* ── Call UI Card ── */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 280, damping: 18 }}
+            className="relative flex flex-col overflow-hidden transition-all duration-300 border shadow-md group rounded-3xl border-base-300 bg-base-100 hover:shadow-xl hover:border-accent/30"
+          >
+            {/* Top gradient zone */}
+            <div className="relative flex flex-col items-center gap-4 px-6 pt-9 pb-7 bg-gradient-to-b from-accent/10 to-transparent">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+              <div className="absolute right-0 w-32 h-32 rounded-full pointer-events-none -top-10 bg-accent/10 blur-2xl" />
+
+              {/* Icon */}
+              <div className="relative z-10 flex items-center justify-center w-[60px] h-[60px] rounded-2xl bg-gradient-to-br from-accent to-info shadow-lg shadow-accent/25 text-[28px] group-hover:scale-110 group-hover:shadow-accent/40 transition-all duration-300">
+                📞
+              </div>
+
+              {/* Title */}
+              <div className="relative z-10 text-center">
+                <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-accent/70 mb-0.5">
+                  Connect Live
+                </p>
+                <h3 className="text-[15px] font-black text-base-content leading-snug">
+                  Video & Audio Calls
+                </h3>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex flex-col items-center flex-1 gap-4 px-6 pt-3 pb-6">
+              <p className="text-[11px] text-base-content/50 text-center leading-relaxed">
+                Jump into seamless WebRTC peer-to-peer calls directly from your
+                study room.
+              </p>
+              <div className="w-full mt-auto">
+                <button
+                  className="w-full h-10 min-h-0 text-sm font-bold btn btn-accent text-accent-content rounded-xl"
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      navigate("/login");
+                    } else {
+                      document.getElementById("features_page_join")?.showModal();
+                    }
+                  }}
+                >
+                  → Try It Now
+                </button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── YouTube Study Card ── */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 280, damping: 18 }}
+            className="relative flex flex-col overflow-hidden transition-all duration-300 border shadow-md group rounded-3xl border-base-300 bg-base-100 hover:shadow-xl hover:border-red-500/30"
+          >
+            {/* Top gradient zone */}
+            <div className="relative flex flex-col items-center gap-4 px-6 pt-9 pb-7 bg-gradient-to-b from-red-500/10 to-transparent">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/40 to-transparent" />
+              <div className="absolute right-0 w-32 h-32 rounded-full pointer-events-none -top-10 bg-red-500/10 blur-2xl" />
+
+              {/* Icon */}
+              <div className="relative z-10 flex items-center justify-center w-[60px] h-[60px] rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/25 group-hover:scale-110 group-hover:shadow-red-500/40 transition-all duration-300">
+                <svg
+                  className="w-8 h-8 text-white fill-current"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+              </div>
+
+              {/* Title */}
+              <div className="relative z-10 text-center">
+                <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-red-500/80 mb-0.5">
+                  Watch Together
+                </p>
+                <h3 className="text-[15px] font-black text-base-content leading-snug">
+                  YouTube Study Stream
+                </h3>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex flex-col items-center flex-1 gap-4 px-6 pt-3 pb-6">
+              <p className="text-[11px] text-base-content/50 text-center leading-relaxed">
+                Stream educational lectures, tutorials, or focus lo-fi playlists
+                together with your group.
+              </p>
+              <div className="w-full mt-auto">
+                <YouTubeModal modalId="features_page_youtube" />
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
         {/* Toast Notifications */}
         <div className="min-h-[56px] max-w-md mx-auto mt-5">
           <AnimatePresence mode="wait">

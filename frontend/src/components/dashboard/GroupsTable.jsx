@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteGroup, leaveGroup } from "../../store/action/group.action";
+import Loading from "../common/Loading";
+import Error from "../common/Error";
 
 function TypeBadge({ type }) {
   return type === "study" ? (
@@ -52,24 +54,11 @@ const GroupsTable = ({ groups, loading, error }) => {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-20">
-        <span className="loading loading-spinner loading-lg text-primary" />
-        <p className="text-base text-base-content/50">Loading your groups…</p>
-      </div>
-    );
+    return <Loading fullScreen={false} message="Loading your groups…" />;
   }
 
   if (error) {
-    return (
-      <div className="flex items-start gap-3 alert alert-error rounded-xl">
-        <span className="text-xl">❌</span>
-        <div>
-          <p className="text-base font-bold">Failed to load groups</p>
-          <p className="text-sm opacity-80 mt-0.5">{error}</p>
-        </div>
-      </div>
-    );
+    return <Error fullScreen={false} message={error || "Failed to load groups"} />;
   }
 
   if (groups.length === 0) {

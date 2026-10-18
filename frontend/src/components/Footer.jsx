@@ -14,8 +14,7 @@ const Footer = () => {
               StudySync
             </button>
             <p className="text-sm opacity-70">
-              Your all-in-one academic companion. Plan smarter, collaborate
-              effortlessly.
+              © 2026 StudySync. All rights reserved.
             </p>
           </div>
 
@@ -50,12 +49,6 @@ const Footer = () => {
               </button>
             </div>
           </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-between pt-6 mt-10 border-t border-base-300 sm:flex-row">
-          <p className="text-xs opacity-60">
-            © {new Date().getFullYear()} StudySync. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>

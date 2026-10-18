@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createGroup } from "../../store/action/group.action";
 import { useNavigate } from "react-router-dom";
 
 const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
   const dialogRef = useRef(null);
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("study");
@@ -23,6 +24,10 @@ const CreateGroupModal = ({ modalId = "create_group_modal", onSuccess }) => {
   };
 
   const open = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
     reset();
     dialogRef.current?.showModal();
   };
