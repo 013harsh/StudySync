@@ -207,6 +207,15 @@ async function userdetails(req, res) {
   }
 }
 
+async function getallusers(req, res) {
+  try {
+    const users = await userModel.find().select("-password");
+    return res.status(200).json({ users });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 async function deleteUser(req, res) {
   try {
     const User = await userModel.deleteOne({ _id: req.params.id });
@@ -300,4 +309,5 @@ module.exports = {
   userdetails,
   deleteUser,
   googleLogin,
+  getallusers,
 };

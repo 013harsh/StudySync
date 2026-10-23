@@ -39,14 +39,8 @@ module.exports = (io, socket) => {
         userId: socket.user.id,
       });
 
-      // Send current online users list to the joining user
+      // Broadcast updated presence to all users in the room (including the joining user)
       const onlineUsers = Array.from(roomPresence.get(groupId));
-      socket.emit("room:presence-update", {
-        groupId,
-        onlineUsers,
-      });
-
-      // Broadcast updated presence to all users in the room
       io.to(groupId).emit("room:presence-update", {
         groupId,
         onlineUsers,

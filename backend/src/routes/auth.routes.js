@@ -7,6 +7,7 @@ const {
   userdetails,
   deleteUser,
   googleLogin,
+  getallusers,
 } = require("../controller/auth.controller");
 const { authMiddleware } = require("../middleware/auth.middleware");
 
@@ -17,4 +18,6 @@ router.post("/userLogout", authMiddleware, logout);
 router.get("/userDetails", authMiddleware, userdetails);
 router.put("/userUpdateProfile", authMiddleware, updateProfile);
 router.delete("/deleteAccount/:id", authMiddleware, deleteUser);
+router.get("/allusers", authMiddleware, getallusers);
+
 module.exports = router;
