@@ -5,47 +5,63 @@ import MemberPanel from "../components/room/MemberPanel";
 import TimerDisplay from "../components/room/TimerDisplay";
 import TimerControls from "../components/room/TimerControls";
 import CallUI from "../components/room/CallUI";
-import io from "socket.io-client";
+import useRoomSocket from "../hooks/useRoomSocket";
+import { getGroupMembers } from "../store/action/group.action";
 import {
   fetchMessage,
   uploadFile,
   removeMessage,
 } from "../store/action/chat.action";
-import { getGroupMembers } from "../store/action/group.action";
-import Loading from "../components/common/Loading";
 import Error from "../components/common/Error";
+import Loading from "../components/common/Loading";
 
 const API = import.meta.env.VITE_API_URL;
 
 const Room = () => {
-  const reduxMessages = useSelector((state) => state.chat.messages);
-
-  const { groupId } = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const socketRef = useRef(null);
-  const callUIRef = useRef(null);
-  const dispatch = useDispatch();
+  const reduxMessages = useSelector((state) => state.chat.messages);
+  const { groupId } = useParams();
 
   const [groupData, setGroupData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [members, setMembers] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const [timerSession, setTimerSession] = useState(null);
-  const [newMessages, setNewMessages] = useState([]);
-  const messages = [...reduxMessages, ...newMessages].filter(
-    (msg, index, self) => index === self.findIndex((m) => m._id === msg._id),
-  );
-
   const [showChat, setShowChat] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const callUIRef = useRef(null);
+
+  const {
+    socket,
+    onlineUsers,
+    timerSession,
+    newMessages,
+    setNewMessages,
+
+    sendMessage: emitSocketMessage,
+  } = useRoomSocket({
+    groupId,
+    user,
+    setMembers,
+
+    // on group delete
+    onGroupDeleted: () => {
+      alert("This group has been deleted by an admin.");
+      navigate("/dashboard");
+    },
+  });
+
+  const messages = [...reduxMessages, ...newMessages].filter(
+    (msg, index, self) => index === self.findIndex((m) => m._id === msg._id),
+  );
 
   const currentUserId = String(user?.id || user?._id || "");
+
   const myMember = members.find((m) => {
     const memberUserId = String(m.user?._id || m.user || "");
     return memberUserId === currentUserId;
@@ -79,146 +95,6 @@ const Room = () => {
     fetchGroup();
   }, [groupId, dispatch]);
 
-  useEffect(() => {
-    setNewMessages([]);
-  }, [groupId]);
-
-  useEffect(() => {
-    if (!user || !groupId) return;
-
-    socketRef.current = io(API, {
-      withCredentials: true,
-      transports: ["polling", "websocket"],
-      upgrade: true,
-    });
-
-    const socket = socketRef.current;
-
-    socket.on("connect", () => {
-      socket.emit("join-group", groupId);
-    });
-    socket.emit("join-group", groupId);
-
-    socket.on("room:presence-update", (data) => {
-      console.log("Presence update:", data);
-      if (data.groupId === groupId) {
-        setOnlineUsers(data.onlineUsers || []);
-      }
-    });
-
-    socket.on("user-joined", (data) => {
-      console.log("User joined:", data);
-      setOnlineUsers((prev) => {
-        if (!prev.includes(data.userId)) {
-          return [...prev, data.userId];
-        }
-        return prev;
-      });
-    });
-
-    socket.on("user-left", (data) => {
-      console.log("User left:", data);
-      setOnlineUsers((prev) => prev.filter((id) => id !== data.userId));
-    });
-
-    socket.on("group:user-joined", (data) => {
-      console.log("Group member joined:", data);
-      if (data.groupId === groupId) {
-        setMembers((prev) => {
-          if (
-            prev.some(
-              (m) => String(m.user?._id || m.user) === String(data.userId),
-            )
-          ) {
-            return prev;
-          }
-          return [
-            ...prev,
-            {
-              user: { _id: data.userId, fullName: data.fullName },
-              role: "member",
-              joinedAt: new Date().toISOString(),
-            },
-          ];
-        });
-      }
-    });
-
-    socket.on("group:user-left", (data) => {
-      console.log("Group member left:", data);
-      if (data.groupId === groupId) {
-        setMembers((prev) => {
-          let updated = prev.filter(
-            (m) => String(m.user?._id || m.user) !== String(data.userId),
-          );
-          if (data.newAdmin) {
-            updated = updated.map((m) =>
-              String(m.user?._id || m.user) === String(data.newAdmin)
-                ? { ...m, role: "admin" }
-                : m,
-            );
-          }
-          return updated;
-        });
-      }
-    });
-
-    socket.on("error", (error) => {
-      console.error("Socket error:", error);
-    });
-
-    socket.on("room:session-started", (data) => {
-      console.log("📊 Session started:", data);
-      if (data.groupId === groupId && data.session) {
-        setTimerSession(data.session);
-      }
-    });
-
-    socket.on("room:timer-update", (data) => {
-      console.log("⏱️ Timer update:", data);
-      if (data.groupId === groupId) {
-        setTimerSession((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            isRunning: data.isRunning,
-            pausedAt: data.pausedAt || null,
-            startedAt: data.startedAt || prev.startedAt,
-            isFinished: data.isFinished || false,
-          };
-        });
-      }
-    });
-
-    socket.on("room:session-ended", (data) => {
-      console.log("⏹️ Session ended:", data);
-      if (data.groupId === groupId) {
-        setTimerSession(null);
-      }
-    });
-
-    socket.on("receive-message", (data) => {
-      const msgData = {
-        ...data,
-        _id: data._id || `temp-${Date.now()}-${Math.random()}`,
-      };
-      setNewMessages((prev) => [...prev, msgData]);
-    });
-
-    socket.on("group:deleted", (data) => {
-      console.log("Group deleted:", data);
-      if (data.groupId === groupId) {
-        alert("This group has been deleted by an admin.");
-        navigate("/dashboard");
-      }
-    });
-
-    return () => {
-      socket.emit("leave-group", { groupId, userId: user.id });
-      socket.disconnect();
-    };
-  }, [groupId, user]);
-
   const handleDelete = (messageId) => {
     if (window.confirm("Are you sure you want to delete this message?")) {
       dispatch(removeMessage(messageId));
@@ -228,11 +104,7 @@ const Room = () => {
 
   const sendMessage = () => {
     if (!chatInput.trim()) return;
-    socketRef.current.emit("send-message", {
-      groupId,
-      message: chatInput.trim(),
-    });
-
+    emitSocketMessage(chatInput);
     setChatInput("");
   };
 
@@ -389,12 +261,7 @@ const Room = () => {
 
   return (
     <div className="flex flex-col h-screen bg-base-200">
-      <CallUI
-        ref={callUIRef}
-        socket={socketRef.current}
-        user={user}
-        groupId={groupId}
-      />
+      <CallUI ref={callUIRef} socket={socket} user={user} groupId={groupId} />
 
       {/* Header */}
       <div className="border-b shadow-sm navbar bg-base-100 border-base-300">
@@ -470,7 +337,7 @@ const Room = () => {
           <TimerDisplay session={timerSession} isHost={isHost} />
           <div className="border-t border-base-300">
             <TimerControls
-              socket={socketRef.current}
+              socket={socket}
               groupId={groupId}
               session={timerSession}
               isHost={isHost}

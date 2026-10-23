@@ -1,17 +1,8 @@
-/**
- * WebRTC Configuration Utility
- * Provides ICE server configuration for production-ready WebRTC connections
- */
-
-/**
- * Get ICE servers configuration from environment variables
- * @returns {RTCConfiguration} WebRTC configuration object
- */
 export const getIceServers = () => {
   const config = {
     iceServers: [],
     iceCandidatePoolSize: 10,
-    iceTransportPolicy: 'all', // 'all' or 'relay' (relay forces TURN)
+    iceTransportPolicy: "all", // 'all' or 'relay' (relay forces TURN)
   };
 
   // Add STUN server (helps discover public IP)
@@ -25,11 +16,11 @@ export const getIceServers = () => {
   // Add backup STUN servers
   const stunUrl2 = import.meta.env.VITE_STUN_URL_2;
   const stunUrl3 = import.meta.env.VITE_STUN_URL_3;
-  
+
   if (stunUrl2) {
     config.iceServers.push({ urls: stunUrl2 });
   }
-  
+
   if (stunUrl3) {
     config.iceServers.push({ urls: stunUrl3 });
   }
@@ -49,10 +40,10 @@ export const getIceServers = () => {
 
   // Fallback to public STUN servers if no config provided
   if (config.iceServers.length === 0) {
-    console.warn('⚠️ No ICE servers configured. Using default STUN servers.');
+    console.warn("⚠️ No ICE servers configured. Using default STUN servers.");
     config.iceServers = [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" },
     ];
   }
 
@@ -65,9 +56,9 @@ export const getIceServers = () => {
  */
 export const createPeerConnection = () => {
   const config = getIceServers();
-  
-  console.log('🔧 Creating RTCPeerConnection with config:', {
-    iceServers: config.iceServers.map(server => ({
+
+  console.log("🔧 Creating RTCPeerConnection with config:", {
+    iceServers: config.iceServers.map((server) => ({
       urls: server.urls,
       hasCredentials: !!(server.username && server.credential),
     })),
@@ -93,28 +84,36 @@ export const isWebRTCSupported = () => {
  * @param {MediaStreamConstraints} constraints Media constraints
  * @returns {Promise<MediaStream>} Media stream
  */
-export const getUserMedia = async (constraints = { video: true, audio: true }) => {
+export const getUserMedia = async (
+  constraints = { video: true, audio: true },
+) => {
   if (!isWebRTCSupported()) {
-    throw new Error('WebRTC is not supported in this browser');
+    throw new Error("WebRTC is not supported in this browser");
   }
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    console.log('✅ Got user media:', {
+    console.log("✅ Got user media:", {
       video: stream.getVideoTracks().length > 0,
       audio: stream.getAudioTracks().length > 0,
     });
     return stream;
   } catch (error) {
-    console.error('❌ Failed to get user media:', error);
-    
+    console.error("❌ Failed to get user media:", error);
+
     // Provide user-friendly error messages
-    if (error.name === 'NotAllowedError') {
-      throw new Error('Camera/microphone access denied. Please allow access and try again.');
-    } else if (error.name === 'NotFoundError') {
-      throw new Error('No camera or microphone found. Please connect a device and try again.');
-    } else if (error.name === 'NotReadableError') {
-      throw new Error('Camera/microphone is already in use by another application.');
+    if (error.name === "NotAllowedError") {
+      throw new Error(
+        "Camera/microphone access denied. Please allow access and try again.",
+      );
+    } else if (error.name === "NotFoundError") {
+      throw new Error(
+        "No camera or microphone found. Please connect a device and try again.",
+      );
+    } else if (error.name === "NotReadableError") {
+      throw new Error(
+        "Camera/microphone is already in use by another application.",
+      );
     } else {
       throw new Error(`Failed to access camera/microphone: ${error.message}`);
     }
@@ -127,7 +126,7 @@ export const getUserMedia = async (constraints = { video: true, audio: true }) =
  */
 export const stopMediaStream = (stream) => {
   if (stream) {
-    stream.getTracks().forEach(track => {
+    stream.getTracks().forEach((track) => {
       track.stop();
       console.log(`🛑 Stopped ${track.kind} track`);
     });
@@ -140,19 +139,21 @@ export const stopMediaStream = (stream) => {
  */
 export const monitorConnectionState = (peerConnection) => {
   peerConnection.oniceconnectionstatechange = () => {
-    console.log('🔌 ICE connection state:', peerConnection.iceConnectionState);
-    
-    if (peerConnection.iceConnectionState === 'failed') {
-      console.error('❌ ICE connection failed. Check TURN server configuration.');
+    console.log("🔌 ICE connection state:", peerConnection.iceConnectionState);
+
+    if (peerConnection.iceConnectionState === "failed") {
+      console.error(
+        "❌ ICE connection failed. Check TURN server configuration.",
+      );
     }
   };
 
   peerConnection.onconnectionstatechange = () => {
-    console.log('🔗 Connection state:', peerConnection.connectionState);
+    console.log("🔗 Connection state:", peerConnection.connectionState);
   };
 
   peerConnection.onsignalingstatechange = () => {
-    console.log('📡 Signaling state:', peerConnection.signalingState);
+    console.log("📡 Signaling state:", peerConnection.signalingState);
   };
 };
 
@@ -174,17 +175,21 @@ export const validateIceConfig = () => {
   };
 
   if (!stunUrl) {
-    result.warnings.push('No STUN server configured. Using default Google STUN.');
+    result.warnings.push(
+      "No STUN server configured. Using default Google STUN.",
+    );
   }
 
   if (!turnUrl || !turnUser || !turnCred) {
     result.warnings.push(
-      'No TURN server configured. WebRTC may not work behind restrictive firewalls or NATs.'
+      "No TURN server configured. WebRTC may not work behind restrictive firewalls or NATs.",
     );
   }
 
   if (turnUrl && (!turnUser || !turnCred)) {
-    result.errors.push('TURN server URL provided but missing username or credential.');
+    result.errors.push(
+      "TURN server URL provided but missing username or credential.",
+    );
   }
 
   return result;
@@ -197,7 +202,7 @@ export const validateIceConfig = () => {
 export const testIceServers = async () => {
   const config = getIceServers();
   const pc = new RTCPeerConnection(config);
-  
+
   return new Promise((resolve) => {
     const results = {
       stun: false,
@@ -208,10 +213,10 @@ export const testIceServers = async () => {
     pc.onicecandidate = (event) => {
       if (event.candidate) {
         results.candidates.push(event.candidate.type);
-        
-        if (event.candidate.type === 'srflx') {
+
+        if (event.candidate.type === "srflx") {
           results.stun = true;
-        } else if (event.candidate.type === 'relay') {
+        } else if (event.candidate.type === "relay") {
           results.turn = true;
         }
       } else {
@@ -222,7 +227,7 @@ export const testIceServers = async () => {
     };
 
     // Create a dummy offer to trigger ICE gathering
-    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+    pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
     // Timeout after 5 seconds
     setTimeout(() => {

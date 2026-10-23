@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useTheme } from "../context/ThemeContext";
 import { userLogout } from "../store/action/auth.action";
@@ -8,6 +8,7 @@ const NavBar = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const firstName = user?.fullName?.firstName || "Guest";
   const lastName = user?.fullName?.lastName || "User";
@@ -23,19 +24,59 @@ const NavBar = () => {
     navigate("/home");
   };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <div className="p-5 border-b shadow-xl px-9 navbar bg-base-100 border-base-500">
-      <div className="flex-1 bg">
+    <div className="p-4 border-b shadow-md sm:p-5 sm:px-9 navbar bg-base-100 border-base-300">
+      <div className="flex items-center flex-1 gap-4">
         <button
           onClick={() => navigate("/home")}
-          className="text-2xl font-bold normal-case text-primary"
+          className="text-2xl font-black tracking-tight normal-case transition-opacity text-primary hover:opacity-90"
         >
           StudySync
         </button>
+
+        {/* Desktop Navigation Links */}
+        <div className="items-center hidden gap-1 ml-4 md:flex">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className={`btn btn-sm btn-ghost rounded-xl font-medium ${
+              isActive("/dashboard")
+                ? "btn-active text-primary font-bold"
+                : "text-base-content/75 hover:text-base-content"
+            }`}
+          >
+            Dashboard
+          </button>
+
+          <button
+            onClick={() => navigate("/users")}
+            className={`btn btn-sm btn-ghost rounded-xl font-medium gap-1.5 ${
+              isActive("/users")
+                ? "btn-active text-primary font-bold"
+                : "text-base-content/75 hover:text-base-content"
+            }`}
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+            <span>All Users</span>
+          </button>
+        </div>
       </div>
 
-      <div className="flex items-center flex-none gap-6 ml-4 ">
-        <div className="flex items-center hidden gap-2 mr-4 md:flex">
+      <div className="flex items-center flex-none gap-3 ml-4 sm:gap-6">
+        <div className="flex items-center hidden gap-2 mr-2 md:flex">
           <button
             onClick={toggleTheme}
             className="btn btn-ghost btn-circle text-base-content"
@@ -67,7 +108,9 @@ const NavBar = () => {
           >
             <div className="w-10 border-2 rounded-full border-primary/50">
               <img
-                src={`https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=random`}
+                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  firstName + " " + lastName,
+                )}&background=random`}
                 alt="User Avatar"
               />
             </div>
@@ -75,13 +118,15 @@ const NavBar = () => {
 
           <ul
             tabIndex={0}
-            className="mt-3 z-[100] p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-box w-56 border border-base-200"
+            className="mt-3 z-[100] p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-box w-60 border border-base-200"
           >
             <li className="px-4 py-2 mb-2 border-b menu-title border-base-200">
-              <span className="font-semibold">
+              <span className="font-semibold text-base-content">
                 {firstName} {lastName}
               </span>
-              <span className="text-xs text-base-content/60">{email}</span>
+              <span className="text-xs truncate text-base-content/60">
+                {email}
+              </span>
             </li>
             <li className="md:hidden">
               <button onClick={toggleTheme} className="whitespace-nowrap">
@@ -89,31 +134,59 @@ const NavBar = () => {
               </button>
             </li>
             <li>
-              <button onClick={() => navigate("/account")}>
-                Account Settings
+              <button
+                onClick={() => navigate("/dashboard")}
+                className={isActive("/dashboard") ? "active font-semibold" : ""}
+              >
+                📊 My Dashboard
               </button>
             </li>
             <li>
-              <button onClick={() => navigate("/dashboard")}>
-                My Dashboard
+              <button
+                onClick={() => navigate("/users")}
+                className={`flex items-center justify-between ${
+                  isActive("/users") ? "active font-semibold" : ""
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <span>👥</span> All Users
+                </span>
+                <span className="badge badge-primary badge-xs">Community</span>
               </button>
             </li>
             <li>
-              <button onClick={() => navigate("/features")}>Features</button>
+              <button
+                onClick={() => navigate("/account")}
+                className={isActive("/account") ? "active font-semibold" : ""}
+              >
+                ⚙️ Account Settings
+              </button>
             </li>
+            <li>
+              <button
+                onClick={() => navigate("/features")}
+                className={isActive("/features") ? "active font-semibold" : ""}
+              >
+                ✨ Features
+              </button>
+            </li>
+            <div className="my-1 divider"></div>
             {isGuest ? (
               <li>
                 <button
                   onClick={() => navigate("/login")}
-                  className="text-primary"
+                  className="font-semibold text-primary"
                 >
-                  Login
+                  🔑 Login
                 </button>
               </li>
             ) : (
               <li>
-                <button onClick={handleLogout} className="text-error">
-                  Logout
+                <button
+                  onClick={handleLogout}
+                  className="font-medium text-error"
+                >
+                  🚪 Logout
                 </button>
               </li>
             )}
@@ -123,5 +196,4 @@ const NavBar = () => {
     </div>
   );
 };
-
 export default NavBar;

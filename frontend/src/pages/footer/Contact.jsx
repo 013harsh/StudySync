@@ -3,15 +3,41 @@ import { useState } from "react";
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Basic UI-only submission (no backend wired yet)
-    setSubmitted(true);
+    setLoading(true);
+    setError(null);
+
+    const sheetUri = import.meta.env.VITE_GOOGLESHEETURI;
+
+    try {
+      if (sheetUri) {
+        await fetch(sheetUri, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify({
+            name: form.name.trim(),
+            email: form.email.trim(),
+            message: form.message.trim(),
+          }),
+        });
+      }
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Error submitting contact form:", err);
+      setError("Failed to send your message. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +67,7 @@ const Contact = () => {
               className="btn btn-primary mt-6 btn-sm"
               onClick={() => {
                 setForm({ name: "", email: "", message: "" });
+                setError(null);
                 setSubmitted(false);
               }}
             >
@@ -52,6 +79,13 @@ const Contact = () => {
             onSubmit={handleSubmit}
             className="card bg-base-200 shadow-md rounded-2xl p-8 space-y-6"
           >
+            {error && (
+              <div className="alert alert-error rounded-xl">
+                <span>❌</span>
+                <p className="text-sm font-semibold">{error}</p>
+              </div>
+            )}
+
             {/* Name */}
             <div className="form-control">
               <label className="label">
@@ -66,6 +100,7 @@ const Contact = () => {
                 className="input input-bordered w-full"
                 value={form.name}
                 onChange={handleChange}
+                disabled={loading}
                 required
               />
             </div>
@@ -84,6 +119,7 @@ const Contact = () => {
                 className="input input-bordered w-full"
                 value={form.email}
                 onChange={handleChange}
+                disabled={loading}
                 required
               />
             </div>
@@ -101,12 +137,24 @@ const Contact = () => {
                 className="textarea textarea-bordered w-full h-36 resize-none"
                 value={form.message}
                 onChange={handleChange}
+                disabled={loading}
                 required
               />
             </div>
 
-            <button type="submit" className="btn btn-primary w-full">
-              Send Message
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm" />
+                  Sending Message...
+                </>
+              ) : (
+                "Send Message"
+              )}
             </button>
           </form>
         )}

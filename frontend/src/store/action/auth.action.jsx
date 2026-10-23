@@ -1,5 +1,13 @@
 import axios from "axios";
-import { loginSuccess, logout, Register, deleteuserAccount } from "../reducer/auth.slice";
+import {
+  loginSuccess,
+  logout,
+  Register,
+  deleteuserAccount,
+  setAllUsers,
+  setUsersLoading,
+  setUsersError,
+} from "../reducer/auth.slice";
 
 // const dispatch = useDispatch();
 export const userRegister = (data) => async (dispatch) => {
@@ -32,10 +40,13 @@ export const userLogin = (data) => async (dispatch) => {
 };
 export const userGoogleLogin = (token) => async (dispatch) => {
   try {
-    const res = await axios.post("/api/auth/googleLogin", { token }, {
-      withCredentials: true,
-    });
-    console.log(res.data.user);
+    const res = await axios.post(
+      "/api/auth/googleLogin",
+      { token },
+      {
+        withCredentials: true,
+      },
+    );
     dispatch(loginSuccess(res.data.user));
     return { success: true, user: res.data.user };
   } catch (error) {
@@ -67,6 +78,23 @@ export const userdetails = () => async (dispatch) => {
     console.log("error", error);
     dispatch(logout());
     return { success: false, error: error.data.message };
+  }
+};
+
+export const getAllusers = () => async (dispatch) => {
+  try {
+    dispatch(setUsersLoading(true));
+    const res = await axios.get("/api/auth/allusers", {
+      withCredentials: true,
+    });
+    const users = res.data?.users || [];
+    dispatch(setAllUsers(users));
+    return { success: true, users };
+  } catch (error) {
+    console.log("error fetching users:", error);
+    const message = error.response?.data?.message || "Failed to fetch users";
+    dispatch(setUsersError(message));
+    return { success: false, error: message };
   }
 };
 

@@ -12,6 +12,7 @@ import Terms from "../pages/footer/Terms.jsx";
 import Privacy from "../pages/footer/Privacy.jsx";
 import Contact from "../pages/footer/Contact.jsx";
 import Hero from "../components/Hero.jsx";
+import Users from "../pages/Users.jsx";
 
 const AppRoutes = () => {
   return (
@@ -39,6 +40,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Account />{" "}
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute>
+            <Users />
           </ProtectedRoute>
         }
       />
